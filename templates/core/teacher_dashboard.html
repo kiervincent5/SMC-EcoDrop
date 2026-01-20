@@ -1,0 +1,119 @@
+{% extends 'core/base_dashboard.html' %}
+{% load humanize %}
+{% block title %}Teacher Dashboard - EcoDrop{% endblock %}
+
+{% block sidebar %}
+<div class="nav-section">
+    <div class="nav-title">navigation</div>
+    <ul>
+        <li><a href="{% url 'teacher_dashboard' %}" class="active">Dashboard</a></li>
+        <li><a href="{% url 'teacher_profile' %}">Profile</a></li>
+        <li><a href="{% url 'rewards' %}">Rewards</a></li>
+        <li><a href="{% url 'redemption_history' %}">Redemption History</a></li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+.recycling { margin-top: 0; }
+.cards { display:flex; gap:16px; flex-wrap:wrap; margin-bottom: 24px; }
+.kpi { flex:1; min-width: 220px; color:#fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.kpi.green { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+.kpi.blue { background: linear-gradient(135deg, #3498db, #2980b9); }
+.kpi-value { font-size: 32px; font-weight: 800; margin-bottom: 4px; }
+.kpi-label { opacity: 0.95; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+.table-card { margin-top: 0; }
+.table-card h3 { margin-bottom: 16px; color: #1f2937; font-size: 1.25rem; }
+.table-wrap { overflow-x:auto; border-radius: 8px; border: 1px solid #e5e7eb; margin: 0; }
+.table-wrap table { width:100%; border-collapse: collapse; table-layout: auto; }
+.table-wrap th { 
+    text-align:left; 
+    padding:14px 16px; 
+    background: #f9fafb; 
+    font-weight: 600; 
+    color: #374151;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e5e7eb;
+}
+.table-wrap th:nth-child(1) { width: 40%; }
+.table-wrap th:nth-child(2) { width: 30%; }
+.table-wrap th:nth-child(3) { width: 30%; }
+.table-wrap td { 
+    text-align:left; 
+    padding:14px 16px; 
+    border-bottom:1px solid #f3f4f6; 
+    color: #4b5563;
+}
+.table-wrap tbody tr:hover { background: #f9fafb; }
+.table-wrap tbody tr:last-child td { border-bottom: none; }
+.pts { 
+    color:#10b981; 
+    font-weight: 700; 
+    background: #d1fae5;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+.bottles-icon { color: #3498db; margin-right: 6px; }
+.card { background:#fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.empty { text-align:center; color:#666; padding: 40px 20px; }
+.empty i { font-size: 48px; color: #d1d5db; margin-bottom: 12px; display: block; }
+
+@media (max-width: 768px) {
+    .cards { flex-direction: column; }
+    .kpi { min-width: 100%; }
+    .table-wrap { border: none; }
+    .table-wrap table { width: 100%; }
+    .table-wrap th, .table-wrap td { padding: 10px 12px; font-size: 0.85rem; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Recycling Dashboard -->
+<section id="recycling" class="recycling" style="margin-top: 24px;">
+    <h2>Recycling Dashboard</h2>
+    <div class="cards">
+        <div class="kpi green">
+            <div class="kpi-value">{{ teacher_bottles }}</div>
+            <div class="kpi-label">Bottles Recycled</div>
+        </div>
+        <div class="kpi blue">
+            <div class="kpi-value">{{ user_profile.total_points|intcomma }}</div>
+            <div class="kpi-label">Total Points</div>
+        </div>
+    </div>
+
+    <div class="card table-card">
+        <h3>Recent Transactions</h3>
+        {% if recent_entries %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Bottles</th>
+                        <th>Points Earned</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in recent_entries %}
+                    <tr>
+                        <td>{{ entry.created_at|date:"M d, Y H:i" }}</td>
+                        <td><i class="fas fa-bottle-water bottles-icon"></i>{{ entry.no_bottle }}</td>
+                        <td><span class="pts">+{{ entry.points }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p class="empty"><i class="fas fa-bottle-water"></i> No transactions yet. Start recycling bottles to earn points!</p>
+        {% endif %}
+    </div>
+
+</section>
+{% endblock %}

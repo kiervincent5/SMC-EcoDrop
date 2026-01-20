@@ -1,0 +1,195 @@
+{% extends 'core/base_dashboard.html' %}
+{% block title %}Edit User - Admin Console{% endblock %}
+
+{% block sidebar %}
+<div class="nav-section">
+    <div class="nav-title">navigation</div>
+    <ul>
+        <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'admin_users' %}" class="active">Manage Users</a></li>
+        <li><a href="{% url 'admin_user_add' %}">Add User</a></li>
+        <li><a href="{% url 'admin_devices' %}">Devices</a></li>
+        <li><a href="{% url 'admin_rewards' %}">Rewards</a></li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+.form-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+.form-input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 8px;
+}
+.checkbox-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+.form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+.btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    font-size: 14px;
+}
+.btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
+.btn-primary {
+    background: #4a90e2;
+    color: white;
+}
+.btn-primary:hover {
+    background: #357abd;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="like-panel" style="max-width: 800px;">
+    <div style="margin-bottom: 24px;">
+        <h1 style="margin: 0 0 8px; font-size: 24px;">✏️ Edit User</h1>
+        <p style="margin: 0; color: #6b7280; font-size: 14px;">Update user information and permissions</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" value="{{ u.username }}" class="form-input" required>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="first_name">First Name</label>
+                <input type="text" id="first_name" name="first_name" value="{{ u.first_name }}" class="form-input">
+            </div>
+            <div class="form-group">
+                <label for="last_name">Last Name</label>
+                <input type="text" id="last_name" name="last_name" value="{{ u.last_name }}" class="form-input">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" value="{{ u.email }}" class="form-input">
+        </div>
+
+        <div class="form-group">
+            <label for="school_id">
+                {% if u.profile.user_type == 'student' %}Student ID{% elif u.profile.user_type == 'teacher' %}Faculty ID{% else %}ID Number{% endif %}
+            </label>
+            <input type="text" id="school_id" name="school_id" value="{{ u.profile.school_id }}" class="form-input" 
+                   placeholder="{% if u.profile.user_type == 'student' %}e.g., C25-0001{% elif u.profile.user_type == 'teacher' %}e.g., SMCIC-001-0001{% else %}Optional ID{% endif %}">
+            <!-- Format helper text hidden -->
+            <!-- <small style="color: #667eea; font-size: 12px; display: block; margin-top: 4px;">
+                {% if u.profile.user_type == 'student' %}
+                    📋 Format: C22-0369 (C=class, 22=year, 0369=student number) | Fully editable
+                {% elif u.profile.user_type == 'teacher' %}
+                    📋 Format: SMCIC-001-0001 (SMCIC=institution, 001=dept, 0001=number) | Fully editable
+                {% else %}
+                    Optional ID field for this user
+                {% endif %}
+            </small> -->
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="total_points">Total Points</label>
+                <input type="number" id="total_points" min="0" name="total_points" value="{{ u.profile.total_points|default:0 }}" class="form-input">
+            </div>
+            <div class="form-group">
+                <label>User Role</label>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="is_staff" name="is_staff" {% if u.is_staff %}checked{% endif %}>
+                    <label for="is_staff" style="margin: 0; font-weight: 500;">Staff / Teacher</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="{% url 'admin_users' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+        </div>
+    </form>
+</section>
+
+{% if u.profile.user_type != 'admin' and u.profile.school_id %}
+<section class="like-panel" style="max-width: 800px;">
+    <h2 style="margin: 0 0 16px;">
+        {% if u.profile.user_type == 'student' %}Student ID Card{% else %}Faculty ID Card{% endif %}
+    </h2>
+    <p style="color: #6b7280; margin-bottom: 16px;">Preview and download the ID card with barcode</p>
+    
+    <div style="text-align: center; padding: 20px; background: #f9fafb; border-radius: 8px;">
+        <img src="{% url 'download_id_card' u.id %}" alt="ID Card Preview" style="max-width: 100%; border: 2px solid #e5e7eb; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        
+        <div style="margin-top: 20px;">
+            <a href="{% url 'download_id_card' u.id %}" download="{{ u.profile.school_id }}_ID_Card.png" class="btn btn-primary" style="display: inline-block; padding: 12px 24px; background: #28a745; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                📥 Download ID Card
+            </a>
+        </div>
+        
+        <p style="margin-top: 12px; color: #6b7280; font-size: 14px;">
+            {% if u.profile.user_type == 'student' %}Student ID{% else %}Faculty ID{% endif %}: <strong>{{ u.profile.school_id }}</strong>
+        </p>
+    </div>
+</section>
+{% elif u.profile.user_type != 'admin' %}
+<section class="like-panel" style="max-width: 800px;">
+    <h2 style="margin: 0 0 16px;">
+        {% if u.profile.user_type == 'student' %}Student ID Card{% else %}Faculty ID Card{% endif %}
+    </h2>
+    <p style="color: #e74c3c;">No ID assigned. Please assign an ID to generate an ID card.</p>
+</section>
+{% endif %}
+
+{% endblock %}

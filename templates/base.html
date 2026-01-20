@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EcoDrop - Bottle Recycling Rewards{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        .navbar {
+            background: rgba(255,255,255,0.1);
+            padding: 15px 0;
+            margin-bottom: 30px;
+        }
+        .navbar .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        .navbar a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: #5a6fd8;
+        }
+        .btn-danger {
+            background: #e74c3c;
+        }
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .points-badge {
+            background: #2ecc71;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        .user-menu {
+            position: relative;
+        }
+        .user-menu-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            white-space: nowrap;
+        }
+        .user-menu-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .user-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 200px;
+            z-index: 1000;
+        }
+        .user-dropdown.show {
+            display: block;
+        }
+        .user-dropdown a {
+            display: block;
+            padding: 12px 20px;
+            color: #333;
+            text-decoration: none;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .user-dropdown a:last-child {
+            border-bottom: none;
+        }
+        .user-dropdown a:hover {
+            background: #f8f9fa;
+        }
+        .arrow-down {
+            display: inline-block;
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 5px solid white;
+            margin-left: 5px;
+        }
+        
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .mobile-menu-toggle:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            .card {
+                padding: 20px;
+                margin: 15px 0;
+                border-radius: 8px;
+            }
+            .navbar .container {
+                position: relative;
+            }
+            .mobile-menu-toggle {
+                display: block;
+            }
+            .nav-links {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                align-items: stretch;
+                background: rgba(255,255,255,0.1);
+                border-radius: 8px;
+                padding: 10px;
+                margin-top: 10px;
+            }
+            .nav-links.show {
+                display: flex;
+            }
+            .navbar a {
+                display: block;
+                padding: 12px;
+            }
+            .nav-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .points-badge {
+                font-size: 14px;
+                padding: 6px 12px;
+            }
+            .user-menu-btn {
+                font-size: 14px;
+                padding: 6px 12px;
+            }
+            h1 {
+                font-size: 1.75rem;
+            }
+            h2 {
+                font-size: 1.5rem;
+            }
+            .btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            .card {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            h2 {
+                font-size: 1.25rem;
+            }
+            .nav-right {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+            .user-menu {
+                width: 100%;
+            }
+            .user-menu-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% if user.is_authenticated %}
+    <nav class="navbar">
+        <div class="container">
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle menu">☰</button>
+            
+            <div class="nav-links" id="navLinks">
+                {% if request.path|slice:":9" == "/console/" or request.path == "/admin_dashboard/" or request.path == "/admin_panel/" %}
+                    <a href="{% url 'admin_dashboard' %}">Dashboard</a>
+                {% elif request.path == "/teacher-dashboard/" or request.path == "/teacher-profile/" %}
+                    <a href="{% url 'teacher_dashboard' %}">Dashboard</a>
+                    <a href="{% url 'teacher_profile' %}">Profile</a>
+                    <a href="{% url 'rewards' %}">Rewards</a>
+                {% else %}
+                    <a href="{% url 'dashboard' %}">Dashboard</a>
+                    <a href="{% url 'student_profile' %}">Profile</a>
+                    <a href="{% url 'rewards' %}">Rewards</a>
+                    {% if user.is_staff and user.is_superuser %}
+                        <a href="{% url 'admin_dashboard' %}">Admin</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+            
+            <div class="nav-right">
+                <span class="points-badge">
+                    {{ user.profile.total_points }} Points
+                </span>
+                
+                <div class="user-menu">
+                    <button class="user-menu-btn" onclick="toggleUserMenu()">
+                        <span>{{ user.first_name }} {{ user.last_name }}</span>
+                        <span class="arrow-down"></span>
+                    </button>
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="{% url 'logout' %}">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+    
+    <script>
+        function toggleMobileMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('show');
+        }
+        
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+        
+        // Close dropdowns when clicking outside
+        window.addEventListener('click', function(e) {
+            if (!e.target.closest('.user-menu')) {
+                const dropdown = document.getElementById('userDropdown');
+                if (dropdown) {
+                    dropdown.classList.remove('show');
+                }
+            }
+            
+            if (!e.target.closest('.mobile-menu-toggle') && !e.target.closest('.nav-links')) {
+                const navLinks = document.getElementById('navLinks');
+                if (navLinks && window.innerWidth <= 768) {
+                    navLinks.classList.remove('show');
+                }
+            }
+        });
+        
+        // Close mobile menu on window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                const navLinks = document.getElementById('navLinks');
+                if (navLinks) {
+                    navLinks.classList.remove('show');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

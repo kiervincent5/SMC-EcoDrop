@@ -1,0 +1,109 @@
+{% extends 'core/base_dashboard.html' %}
+{% block title %}Add New Reward - Admin Console{% endblock %}
+
+{% block sidebar %}
+<div class="nav-section">
+    <div class="nav-title">navigation</div>
+    <ul>
+        <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'admin_users' %}">Manage Users</a></li>
+        <li><a href="{% url 'admin_user_add' %}">Add User</a></li>
+        <li><a href="{% url 'admin_devices' %}">Devices</a></li>
+        <li><a href="{% url 'admin_rewards' %}" class="active">Rewards</a></li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+.form-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+.form-input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+.form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+.btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    font-size: 14px;
+}
+.btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
+.btn-primary {
+    background: #4a90e2;
+    color: white;
+}
+.btn-primary:hover {
+    background: #357abd;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="like-panel" style="max-width: 600px;">
+    <div style="margin-bottom: 24px;">
+        <h1 style="margin: 0 0 8px; font-size: 24px;"><i class="fas fa-gift"></i> Add New Reward</h1>
+        <p style="margin: 0; color: #6b7280; font-size: 14px;">Create a new reward item for students to redeem</p>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="reward_name">Reward Name</label>
+            <input type="text" id="reward_name" name="reward_name" class="form-input" required placeholder="e.g., Coffee Voucher">
+        </div>
+
+        <div class="form-group">
+            <label for="points_required">Points Required</label>
+            <input type="number" id="points_required" name="points_required" min="1" class="form-input" required placeholder="e.g., 50">
+        </div>
+
+        <div class="form-group">
+            <label for="image">Reward Image *</label>
+            <input type="file" id="image" name="image" class="form-input" accept="image/*" required>
+            <small style="color: #6b7280; font-size: 12px;">Upload an image to represent this reward (PNG, JPG, or GIF)</small>
+        </div>
+
+        <div class="form-actions">
+            <a href="{% url 'admin_rewards' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Add Reward</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,247 @@
+{% extends 'core/base_dashboard.html' %}
+{% load static %}
+{% block title %}Student Profile - EcoDrop{% endblock %}
+
+{% block sidebar %}
+<div class="nav-section">
+  <div class="nav-title">navigation</div>
+  <ul>
+    <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+    <li><a href="{% url 'student_profile' %}" class="active">Profile</a></li>
+    <li><a href="{% url 'rewards' %}">Rewards</a></li>
+    <li><a href="{% url 'redemption_history' %}">Redemption History</a></li>
+  </ul>
+</div>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+  .cover {
+    position: relative !important;
+    height: 220px !important;
+    min-height: 220px !important;
+    overflow: hidden;
+  }
+
+  .cover-img {
+    width: 100% !important;
+    height: 220px !important;
+    min-height: 220px !important;
+    object-fit: cover !important;
+  }
+
+  .profile-card {
+    position: absolute !important;
+    left: 30px !important;
+    bottom: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 15px !important;
+    z-index: 100 !important;
+  }
+
+  .avatar-pic {
+    width: 100px !important;
+    height: 100px !important;
+    border-radius: 8px !important;
+    background: #fff !important;
+    color: #4a90e2 !important;
+    display: grid !important;
+    place-items: center !important;
+    font-weight: 700 !important;
+    font-size: 40px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+  }
+
+  .profile-info .name {
+    font-weight: 700 !important;
+    font-size: 22px !important;
+    color: #fff !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .profile-info .subtitle {
+    color: #fff !important;
+    font-size: 13px !important;
+    margin-top: 2px !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .tabs {
+    margin: 40px 0 12px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tab {
+    padding: 10px 12px;
+    color: #374151;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .tab.active {
+    border-color: #4a90e2;
+    color: #111827;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .info-grid .row {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .info-grid .label {
+    color: #6b7280;
+    font-size: 13px;
+  }
+
+  .info-grid .val {
+    font-weight: 600;
+    word-break: break-word;
+  }
+
+  /* Mobile Responsive Styles */
+  @media (max-width: 768px) {
+    .cover {
+      height: 180px !important;
+      min-height: 180px !important;
+    }
+
+    .cover-img {
+      height: 180px !important;
+      min-height: 180px !important;
+    }
+
+    .profile-card {
+      left: 15px !important;
+      bottom: 15px !important;
+      gap: 10px !important;
+    }
+
+    .avatar-pic {
+      width: 70px !important;
+      height: 70px !important;
+      font-size: 28px !important;
+    }
+
+    .profile-info .name {
+      font-size: 18px !important;
+    }
+
+    .profile-info .subtitle {
+      font-size: 11px !important;
+    }
+
+    .tabs {
+      margin: 20px 0 12px;
+      padding: 6px;
+      gap: 8px;
+    }
+
+    .tab {
+      padding: 8px 10px;
+      font-size: 14px;
+    }
+
+    .info-grid {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    .info-grid .row {
+      padding: 12px 0;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .cover {
+      height: 150px !important;
+      min-height: 150px !important;
+    }
+
+    .cover-img {
+      height: 150px !important;
+      min-height: 150px !important;
+    }
+
+    .profile-card {
+      left: 10px !important;
+      bottom: 10px !important;
+      gap: 8px !important;
+    }
+
+    .avatar-pic {
+      width: 60px !important;
+      height: 60px !important;
+      font-size: 24px !important;
+    }
+
+    .profile-info .name {
+      font-size: 16px !important;
+    }
+
+    .profile-info .subtitle {
+      font-size: 10px !important;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Banner / Cover -->
+<section class="cover" style="position: relative !important; height: 220px !important;">
+  <img src="{% static 'core/images/smcbackground.jpg' %}" alt="Campus" class="cover-img"
+    style="width: 100%; height: 220px; object-fit: cover;">
+  <div class="profile-card"
+    style="position: absolute !important; left: 30px !important; bottom: 20px !important; display: flex !important; z-index: 100 !important;">
+    <div class="avatar-pic"
+      style="width: 100px; height: 100px; border-radius: 8px; background: #fff; color: #4a90e2; display: grid; place-items: center; font-weight: 700; font-size: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+      {{ user.first_name|default:user.username|first|upper }}</div>
+    <div class="profile-info" style="display: flex; flex-direction: column; justify-content: center;">
+      <div class="name" style="font-weight: 700; font-size: 22px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+        {{ user.get_full_name|default:user.username }}</div>
+      <div class="subtitle"
+        style="color: #fff; font-size: 13px; margin-top: 2px; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">BS - INFORMATION
+        TECHNOLOGY</div>
+    </div>
+  </div>
+</section>
+
+<!-- Tabs -->
+<nav class="tabs">
+  <a href="#" class="tab active">Personal Info</a>
+  <a href="#" class="tab">Educational Details</a>
+  <a href="#" class="tab">Family Details</a>
+  <a href="#" class="tab">Account Details</a>
+</nav>
+
+<section class="like-panel">
+  <h3>About Me</h3>
+  <div class="info-grid">
+    <div class="row"><span class="label">Full Name</span><span class="val">{{ user.get_full_name|default:user.username }}</span></div>
+    <div class="row"><span class="label">SMC - ID</span><span class="val">{{ user_profile.school_id|default:"No ID" }}</span></div>
+    <div class="row"><span class="label">Gender</span><span class="val">N/A</span></div>
+    <div class="row"><span class="label">Birth Date</span><span class="val">N/A</span></div>
+    <div class="row"><span class="label">Religion</span><span class="val">N/A</span></div>
+    <div class="row"><span class="label">Nationality</span><span class="val">N/A</span></div>
+  </div>
+</section>
+{% endblock %}

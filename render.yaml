@@ -1,0 +1,30 @@
+services:
+  # Django Web Service
+  - type: web
+    name: ecodrop-web
+    runtime: python
+    buildCommand: chmod +x build.sh && ./build.sh
+    startCommand: gunicorn ecodrop_project.wsgi:application --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: DJANGO_SUPERUSER_USERNAME
+        value: admin
+      - key: DJANGO_SUPERUSER_EMAIL
+        value: admin@ecodrop.com
+      - key: DJANGO_SUPERUSER_PASSWORD
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ecodrop-db
+          property: connectionString
+
+databases:
+  # PostgreSQL Database
+  - name: ecodrop-db
+    databaseName: ecodrop
+    user: ecodrop_user

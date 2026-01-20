@@ -1,0 +1,145 @@
+{% extends 'core/base_dashboard.html' %}
+{% block title %}Edit Device - Admin Console{% endblock %}
+
+{% block sidebar %}
+<div class="nav-section">
+    <div class="nav-title">navigation</div>
+    <ul>
+        <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'admin_users' %}">Manage Users</a></li>
+        <li><a href="{% url 'admin_user_add' %}">Add User</a></li>
+        <li><a href="{% url 'admin_devices' %}" class="active">Devices</a></li>
+        <li><a href="{% url 'admin_rewards' %}">Rewards</a></li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+.form-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+.form-input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+.form-select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+}
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+.form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+.btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    font-size: 14px;
+}
+.btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
+.btn-primary {
+    background: #4a90e2;
+    color: white;
+}
+.btn-primary:hover {
+    background: #357abd;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="like-panel" style="max-width: 800px;">
+    <div style="margin-bottom: 24px;">
+        <h1 style="margin: 0 0 8px; font-size: 24px;"><i class="fas fa-microchip"></i> Edit Device</h1>
+        <p style="margin: 0; color: #6b7280; font-size: 14px;">Update device information and settings</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="name">Device Name</label>
+                <input type="text" id="name" name="name" value="{{ device.name }}" class="form-input" required>
+            </div>
+            <div class="form-group">
+                <label for="device_id">Device ID</label>
+                <input type="text" id="device_id" name="device_id" value="{{ device.device_id }}" class="form-input" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="location">Location</label>
+            <input type="text" id="location" name="location" value="{{ device.location }}" class="form-input">
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" name="status" class="form-select">
+                    <option value="online" {% if device.status == 'online' %}selected{% endif %}>Online</option>
+                    <option value="offline" {% if device.status == 'offline' %}selected{% endif %}>Offline</option>
+                    <option value="maintenance" {% if device.status == 'maintenance' %}selected{% endif %}>Maintenance</option>
+                    <option value="error" {% if device.status == 'error' %}selected{% endif %}>Error</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="total_bottles_processed">Total Bottles Processed</label>
+                <input type="number" id="total_bottles_processed" name="total_bottles_processed" value="{{ device.total_bottles_processed|default:0 }}" class="form-input" min="0">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="api_key">API Key</label>
+            <input type="text" id="api_key" name="api_key" value="{{ device.api_key }}" class="form-input" readonly style="background: #f9fafb;">
+            <small style="color: #6b7280; font-size: 12px;">API key cannot be changed for security reasons</small>
+        </div>
+
+        <div class="form-actions">
+            <a href="{% url 'admin_devices' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

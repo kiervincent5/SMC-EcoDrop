@@ -1,0 +1,132 @@
+{% extends 'core/base_dashboard.html' %}
+{% block title %}Edit Reward - Admin Console{% endblock %}
+
+{% block sidebar %}
+<div class="nav-section">
+    <div class="nav-title">navigation</div>
+    <ul>
+        <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'admin_users' %}">Manage Users</a></li>
+        <li><a href="{% url 'admin_user_add' %}">Add User</a></li>
+        <li><a href="{% url 'admin_devices' %}">Devices</a></li>
+        <li><a href="{% url 'admin_rewards' %}" class="active">Rewards</a></li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+.form-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+.form-input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+.form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+.btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    font-size: 14px;
+}
+.btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
+.btn-primary {
+    background: #4a90e2;
+    color: white;
+}
+.btn-primary:hover {
+    background: #357abd;
+}
+.btn-danger {
+    background: #e74c3c;
+    color: white;
+}
+.btn-danger:hover {
+    background: #c0392b;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="like-panel" style="max-width: 600px;">
+    <div style="margin-bottom: 24px;">
+        <h1 style="margin: 0 0 8px; font-size: 24px;">✏️ Edit Reward</h1>
+        <p style="margin: 0; color: #6b7280; font-size: 14px;">Update reward information</p>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="reward_name">Reward Name</label>
+            <input type="text" id="reward_name" name="reward_name" value="{{ reward.reward_name }}" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+            <label for="points_required">Points Required</label>
+            <input type="number" id="points_required" name="points_required" value="{{ reward.points_required }}" min="1" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+            <label for="image">Reward Image *</label>
+            {% if reward.image %}
+                <div style="margin-bottom: 8px;">
+                    <img src="{{ reward.image.url }}" alt="{{ reward.reward_name }}" style="width: 80px; height: 80px; object-fit: contain; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px;">
+                    <p style="color: #6b7280; font-size: 12px; margin-top: 4px;">Current image</p>
+                </div>
+            {% endif %}
+            <input type="file" id="image" name="image" class="form-input" accept="image/*">
+            <small style="color: #6b7280; font-size: 12px;">Upload a new image {% if not reward.image %}(required){% else %}(leave empty to keep current){% endif %}</small>
+        </div>
+
+        <div class="form-actions">
+            <div>
+                <a href="{% url 'admin_rewards' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <button type="button" onclick="if(confirm('Are you sure you want to delete this reward?')) document.getElementById('deleteForm').submit();" class="btn btn-danger">🗑️ Delete</button>
+                <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+            </div>
+        </div>
+    </form>
+</section>
+
+<!-- Delete Form -->
+<form id="deleteForm" method="post" action="{% url 'admin_reward_delete' reward.id %}" style="display: none;">
+    {% csrf_token %}
+</form>
+{% endblock %}

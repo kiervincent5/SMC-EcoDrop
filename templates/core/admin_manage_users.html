@@ -1,0 +1,190 @@
+{% extends 'core/base_dashboard.html' %}
+
+{% block title %}Manage Users - Admin Console{% endblock %}
+
+{% block sidebar %}
+<div class="nav-section">
+    <div class="nav-title">navigation</div>
+    <ul>
+        <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'admin_users' %}" class="active">Manage Users</a></li>
+        <li><a href="{% url 'admin_user_add' %}">Add User</a></li>
+        <li><a href="{% url 'admin_devices' %}">Devices</a></li>
+        <li><a href="{% url 'admin_rewards' %}">Rewards</a></li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block content %}
+<section class="like-panel">
+  <h1>Manage Users</h1>
+  <p style="color:#666;margin:6px 0 16px;">Filter, sort, and paginate users. Click Manage to edit in Django Admin.</p>
+
+  <!-- Controls -->
+  <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+    <input id="userSearch" type="search" placeholder="Search username, name, or email" style="flex:1; min-width:240px; padding:10px; border:1px solid #dcdcdc; border-radius:6px;">
+    <select id="roleFilter" style="padding:10px; border:1px solid #dcdcdc; border-radius:6px;">
+      <option value="all">All roles</option>
+      <option value="student">Students</option>
+      <option value="staff">Staff</option>
+    </select>
+    <select id="pageSize" style="padding:10px; border:1px solid #dcdcdc; border-radius:6px;">
+      <option value="10">10 / page</option>
+      <option value="25" selected>25 / page</option>
+      <option value="50">50 / page</option>
+      <option value="100">100 / page</option>
+    </select>
+  </div>
+
+  <div style="overflow-x:auto;">
+    <table id="usersTable" style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr style="background:#f8f9fa;">
+          <th data-sort="username" class="sortable" style="padding:10px; text-align:left; border-bottom:2px solid #e5e7eb; cursor:pointer;">Username ▾</th>
+          <th data-sort="name" class="sortable" style="padding:10px; text-align:left; border-bottom:2px solid #e5e7eb; cursor:pointer;">Full Name</th>
+          <th data-sort="email" class="sortable" style="padding:10px; text-align:left; border-bottom:2px solid #e5e7eb; cursor:pointer;">Email</th>
+          <th data-sort="points" class="sortable" style="padding:10px; text-align:left; border-bottom:2px solid #e5e7eb; cursor:pointer;">Points</th>
+          <th data-sort="role" class="sortable" style="padding:10px; text-align:left; border-bottom:2px solid #e5e7eb; cursor:pointer;">Type</th>
+          <th style="padding:10px; text-align:left; border-bottom:2px solid #e5e7eb;">Manage</th>
+        </tr>
+      </thead>
+      <tbody id="usersBody">
+        {% for u in users %}
+        {% with full_name=u.first_name|default:''|add:' '|add:u.last_name|default:'' %}
+        <tr data-username="{{ u.username|lower }}" data-name="{{ full_name|lower }}" data-email="{{ u.email|default:''|lower }}" data-points="{{ u.profile.total_points|default:0 }}" data-role="{{ u.is_staff|yesno:'staff,student' }}">
+          <td style="padding:10px; border-bottom:1px solid #e5e7eb;"><code>{{ u.username }}</code></td>
+          <td style="padding:10px; border-bottom:1px solid #e5e7eb;">{{ u.first_name }} {{ u.last_name }}</td>
+          <td style="padding:10px; border-bottom:1px solid #e5e7eb;">{{ u.email|default:"-" }}</td>
+          <td style="padding:10px; border-bottom:1px solid #e5e7eb;"><strong style="color:#2ecc71;">{{ u.profile.total_points|default:0 }}</strong></td>
+          <td style="padding:10px; border-bottom:1px solid #e5e7eb;">
+            {% if u.profile.user_type == 'admin' %}
+              <span style="background:#9b59b6;color:#fff;padding:3px 8px;border-radius:12px;font-size:.85rem;">Admin</span>
+            {% elif u.profile.user_type == 'teacher' %}
+              <span style="background:#e74c3c;color:#fff;padding:3px 8px;border-radius:12px;font-size:.85rem;">Faculty</span>
+            {% elif u.is_staff %}
+              <span style="background:#e74c3c;color:#fff;padding:3px 8px;border-radius:12px;font-size:.85rem;">Faculty</span>
+            {% else %}
+              <span style="background:#3498db;color:#fff;padding:3px 8px;border-radius:12px;font-size:.85rem;">Student</span>
+            {% endif %}
+          </td>
+          <td style="padding:10px; border-bottom:1px solid #e5e7eb;">
+            <a class="btn" href="{% url 'admin_user_edit' u.id %}">Manage</a>
+          </td>
+        </tr>
+        {% endwith %}
+        {% empty %}
+        <tr><td colspan="6" style="padding:16px; text-align:center; color:#666;">No users found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div id="pager" style="display:flex; gap:8px; align-items:center; justify-content:flex-end; margin-top:12px; flex-wrap:wrap;"></div>
+</div>
+
+<script>
+(function(){
+  const q = (sel, el=document) => el.querySelector(sel);
+  const qa = (sel, el=document) => Array.from(el.querySelectorAll(sel));
+
+  const searchEl = q('#userSearch');
+  const roleEl = q('#roleFilter');
+  const sizeEl = q('#pageSize');
+  const tbody = q('#usersBody');
+  const rows = qa('tr[data-username]', tbody);
+  const pager = q('#pager');
+  let sortKey = 'username';
+  let sortDir = 'asc';
+
+  function cmp(a,b){
+    if(sortKey === 'points'){
+      const av = parseInt(a.dataset.points||'0',10);
+      const bv = parseInt(b.dataset.points||'0',10);
+      return av - bv;
+    }
+    const av = (a.dataset[sortKey]||'').toString();
+    const bv = (b.dataset[sortKey]||'').toString();
+    return av.localeCompare(bv);
+  }
+
+  function apply(){
+    const term = (searchEl.value||'').trim().toLowerCase();
+    const role = roleEl.value;
+    const size = parseInt(sizeEl.value,10);
+
+    let filtered = rows.filter(r => {
+      const hay = (r.dataset.username+' '+r.dataset.name+' '+r.dataset.email).toLowerCase();
+      const matchTerm = term === '' || hay.includes(term);
+      const matchRole = role === 'all' || r.dataset.role === role;
+      return matchTerm && matchRole;
+    });
+
+    filtered.sort((a,b)=>{
+      const res = cmp(a,b);
+      return sortDir === 'asc' ? res : -res;
+    });
+
+    // paging
+    const pages = Math.max(1, Math.ceil(filtered.length / size));
+    let page = parseInt(pager.dataset.page||'1',10);
+    if(page > pages) page = pages;
+    pager.dataset.page = String(page);
+    const start = (page-1)*size;
+    const end = start + size;
+
+    // render
+    rows.forEach(r => r.style.display = 'none');
+    filtered.slice(start, end).forEach(r => r.style.display = '');
+
+    // render pager
+    const btn = (label, p, disabled=false)=>`<button ${disabled? 'disabled':''} data-goto="${p}" style="padding:8px 10px;border:1px solid #dcdcdc;border-radius:6px;background:#fff;${disabled?'opacity:.6;':''}">${label}</button>`;
+    let html = '';
+    html += btn('Prev', Math.max(1,page-1), page===1);
+    // page numbers (compact)
+    const maxButtons = 7;
+    const half = Math.floor(maxButtons/2);
+    let startPage = Math.max(1, page - half);
+    let endPage = Math.min(pages, startPage + maxButtons - 1);
+    startPage = Math.max(1, endPage - maxButtons + 1);
+    for(let i=startPage;i<=endPage;i++){
+      html += `<button data-goto="${i}" style="padding:8px 10px;border:1px solid #dcdcdc;border-radius:6px;${i===page?'background:#4a90e2;color:#fff;border-color:#4a90e2;':''}">${i}</button>`;
+    }
+    html += btn('Next', Math.min(pages,page+1), page===pages);
+    pager.innerHTML = html;
+  }
+
+  // sorting
+  qa('th.sortable', q('#usersTable')).forEach(th=>{
+    th.addEventListener('click', ()=>{
+      const key = th.getAttribute('data-sort');
+      if(sortKey === key){ sortDir = (sortDir==='asc')?'desc':'asc'; }
+      else { sortKey = key; sortDir = 'asc'; }
+      // update indicator
+      qa('th.sortable', q('#usersTable')).forEach(x=>{
+        const base = x.textContent.replace(/[\s▾▴]+$/,'');
+        x.textContent = base + (x===th ? (sortDir==='asc'?' ▾':' ▴') : '');
+      });
+      apply();
+    });
+  });
+
+  // change handlers
+  [searchEl, roleEl, sizeEl].forEach(el=>{
+    el.addEventListener('input', ()=>{ pager.dataset.page = '1'; apply(); });
+    el.addEventListener('change', ()=>{ pager.dataset.page = '1'; apply(); });
+  });
+  pager.addEventListener('click', (e)=>{
+    const t = e.target.closest('button[data-goto]');
+    if(!t) return;
+    pager.dataset.page = t.getAttribute('data-goto');
+    apply();
+  });
+
+  // initial render
+  pager.dataset.page = '1';
+  apply();
+})();
+</script>
+</section>
+{% endblock %}

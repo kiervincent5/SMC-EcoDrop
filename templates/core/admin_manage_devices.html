@@ -1,0 +1,50 @@
+{% extends 'core/base_dashboard.html' %}
+{% block title %}Manage Devices - Admin Console{% endblock %}
+
+{% block sidebar %}
+<div class="nav-section">
+    <div class="nav-title">navigation</div>
+    <ul>
+        <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'admin_users' %}">Manage Users</a></li>
+        <li><a href="{% url 'admin_user_add' %}">Add User</a></li>
+        <li><a href="{% url 'admin_devices' %}" class="active">Devices</a></li>
+        <li><a href="{% url 'admin_rewards' %}">Rewards</a></li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block content %}
+<section class="like-panel">
+  <h1><i class="fas fa-microchip"></i> Manage Devices</h1>
+  <p style="color:#666;margin:6px 0 16px;">Read-only list of devices. Use Django Admin for add/edit. We can add inline actions later.</p>
+  <div style="overflow-x:auto;">
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr style="background:#f8f9fa;">
+          <th style="padding:10px;border-bottom:2px solid #e5e7eb;text-align:left;">Name</th>
+          <th style="padding:10px;border-bottom:2px solid #e5e7eb;text-align:left;">Device ID</th>
+          <th style="padding:10px;border-bottom:2px solid #e5e7eb;text-align:left;">Location</th>
+          <th style="padding:10px;border-bottom:2px solid #e5e7eb;text-align:left;">Status</th>
+          <th style="padding:10px;border-bottom:2px solid #e5e7eb;text-align:left;">Total Bottles</th>
+          <th style="padding:10px;border-bottom:2px solid #e5e7eb;text-align:left;">Admin</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in devices %}
+        <tr>
+          <td style="padding:10px;border-bottom:1px solid #e5e7eb;">{{ d.device_name }}</td>
+          <td style="padding:10px;border-bottom:1px solid #e5e7eb;">{{ d.device_id }}</td>
+          <td style="padding:10px;border-bottom:1px solid #e5e7eb;">{{ d.location }}</td>
+          <td style="padding:10px;border-bottom:1px solid #e5e7eb;">{{ d.status|title }}</td>
+          <td style="padding:10px;border-bottom:1px solid #e5e7eb;">{{ d.total_bottles_processed }}</td>
+          <td style="padding:10px;border-bottom:1px solid #e5e7eb;"><a class="btn" href="{% url 'admin_device_edit' d.id %}">Manage</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" style="padding:16px;text-align:center;color:#666;">No devices found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

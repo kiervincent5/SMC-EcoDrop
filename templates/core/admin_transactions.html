@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% block title %}Transaction History - Admin Console{% endblock %}
+{% block content %}
+<style>
+  .transaction-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .transaction-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+  }
+  .transaction-table thead tr {
+    background: #f8f9fa;
+  }
+  .transaction-table th {
+    padding: 10px;
+    border-bottom: 2px solid #e5e7eb;
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .transaction-table td {
+    padding: 10px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .transaction-table tbody tr:hover {
+    background: #f9fafb;
+  }
+  
+  /* Mobile Card View */
+  .transaction-cards {
+    display: none;
+  }
+  .transaction-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 12px;
+  }
+  .transaction-card-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .transaction-card-row:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  .transaction-card-label {
+    font-weight: 600;
+    color: #666;
+    font-size: 13px;
+  }
+  .transaction-card-value {
+    color: #333;
+    text-align: right;
+  }
+  
+  @media (max-width: 768px) {
+    .transaction-table-wrapper {
+      display: none;
+    }
+    .transaction-cards {
+      display: block;
+    }
+    .card h1 {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+
+<div class="card">
+  <h1><i class="fas fa-chart-bar"></i> Transaction History</h1>
+  <p style="color:#666; margin: 10px 0 20px;">All bottle deposit transactions (showing last 200)</p>
+  
+  <!-- Desktop Table View -->
+  <div class="transaction-table-wrapper">
+    <table class="transaction-table">
+      <thead>
+        <tr>
+          <th>Date & Time</th>
+          <th>User</th>
+          <th>Student ID</th>
+          <th>Bottles</th>
+          <th>Points</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in transactions %}
+        <tr>
+          <td>{{ t.created_at|date:"M d, Y H:i:s" }}</td>
+          <td>{{ t.user_profile.user.first_name }} {{ t.user_profile.user.last_name }}</td>
+          <td><code>{{ t.user_profile.school_id|default:"-" }}</code></td>
+          <td><i class="fas fa-bottle-water"></i> {{ t.no_bottle }}</td>
+          <td><strong style="color:#2ecc71;">+{{ t.points }}</strong></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" style="padding:16px;text-align:center;color:#666;">No transactions yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- Mobile Card View -->
+  <div class="transaction-cards">
+    {% for t in transactions %}
+    <div class="transaction-card">
+      <div class="transaction-card-row">
+        <span class="transaction-card-label">Date & Time</span>
+        <span class="transaction-card-value">{{ t.created_at|date:"M d, Y H:i" }}</span>
+      </div>
+      <div class="transaction-card-row">
+        <span class="transaction-card-label">User</span>
+        <span class="transaction-card-value">{{ t.user_profile.user.first_name }} {{ t.user_profile.user.last_name }}</span>
+      </div>
+      <div class="transaction-card-row">
+        <span class="transaction-card-label">Student ID</span>
+        <span class="transaction-card-value"><code>{{ t.user_profile.school_id|default:"-" }}</code></span>
+      </div>
+      <div class="transaction-card-row">
+        <span class="transaction-card-label">Bottles</span>
+        <span class="transaction-card-value"><i class="fas fa-bottle-water"></i> {{ t.no_bottle }}</span>
+      </div>
+      <div class="transaction-card-row">
+        <span class="transaction-card-label">Points</span>
+        <span class="transaction-card-value"><strong style="color:#2ecc71;">+{{ t.points }}</strong></span>
+      </div>
+    </div>
+    {% empty %}
+    <p style="padding:16px;text-align:center;color:#666;">No transactions yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

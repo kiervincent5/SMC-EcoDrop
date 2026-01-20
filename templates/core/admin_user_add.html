@@ -1,0 +1,184 @@
+{% extends 'core/base_dashboard.html' %}
+{% block title %}Add New User - Admin Console{% endblock %}
+
+{% block sidebar %}
+<div class="nav-section">
+    <div class="nav-title">navigation</div>
+    <ul>
+        <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'admin_users' %}">Manage Users</a></li>
+        <li><a href="{% url 'admin_user_add' %}" class="active">Add User</a></li>
+        <li><a href="{% url 'admin_devices' %}">Devices</a></li>
+        <li><a href="{% url 'admin_rewards' %}">Rewards</a></li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+  .form-container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+  }
+  .form-group input[type="text"],
+  .form-group input[type="email"],
+  .form-group input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  .form-group input[type="checkbox"] {
+    margin-right: 8px;
+  }
+  .btn-submit {
+    background: #667eea;
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 10px;
+  }
+  .btn-submit:hover {
+    background: #5a6fd8;
+  }
+  .btn-cancel {
+    background: #95a5a6;
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-cancel:hover {
+    background: #7f8c8d;
+  }
+  .message {
+    padding: 12px;
+    margin: 15px 0;
+    border-radius: 6px;
+  }
+  .message-error {
+    background: #fee;
+    color: #c00;
+  }
+  .message-success {
+    background: #efe;
+    color: #060;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="like-panel" style="max-width: 600px;">
+  <h1><i class="fas fa-user-plus"></i> Add New User</h1>
+  
+  {% if messages %}
+    {% for message in messages %}
+      <div class="message {% if message.tags == 'error' %}message-error{% else %}message-success{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+  
+  <form method="POST">
+    {% csrf_token %}
+    
+    <div class="form-group">
+      <label>Username *</label>
+      <input type="text" name="username" required>
+    </div>
+    
+    <div class="form-group">
+      <label>Password *</label>
+      <input type="password" name="password" required>
+    </div>
+    
+    <div class="form-group">
+      <label>First Name</label>
+      <input type="text" name="first_name">
+    </div>
+    
+    <div class="form-group">
+      <label>Last Name</label>
+      <input type="text" name="last_name">
+    </div>
+    
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" name="email">
+    </div>
+    
+    <div class="form-group">
+      <label>User Type *</label>
+      <select name="user_type" id="user_type" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px;" onchange="toggleStudentId()">
+        <option value="student">Student</option>
+        <option value="teacher">Teacher/Faculty</option>
+        <option value="staff">Staff/Admin</option>
+      </select>
+    </div>
+    
+    <div class="form-group" id="school_id_group">
+      <label>Student ID</label>
+      <input type="text" name="school_id" id="school_id" value="{{ next_school_id }}" placeholder="e.g., C25-0001">
+      <!-- Format helper text hidden -->
+      <!-- <small style="color: #667eea; font-size: 13px; display: block; margin-top: 4px;">
+         Format: C22-0369 (C=class, 22=year, 0369=student number) | Suggested: {{ next_school_id }} | Editable
+      </small> -->
+    </div>
+    
+    <div class="form-group" id="faculty_id_group" style="display: none;">
+      <label>Faculty ID</label>
+      <input type="text" name="faculty_id" id="faculty_id" value="{{ next_faculty_id }}" placeholder="e.g., SMCIC-001-0001">
+      <!-- Format helper text hidden -->
+      <!-- <small style="color: #667eea; font-size: 13px; display: block; margin-top: 4px;">
+         Format: SMCIC-001-0001 (SMCIC=institution, 001=dept, 0001=number) | Suggested: {{ next_faculty_id }} | Editable
+      </small> -->
+    </div>
+    
+    <div style="margin-top: 30px;">
+      <button type="submit" class="btn-submit">Create User</button>
+      <a href="{% url 'admin_users' %}" class="btn-cancel">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<script>
+  function toggleStudentId() {
+    const userType = document.getElementById('user_type').value;
+    const studentIdGroup = document.getElementById('school_id_group');
+    const facultyIdGroup = document.getElementById('faculty_id_group');
+    
+    // Hide both first
+    studentIdGroup.style.display = 'none';
+    facultyIdGroup.style.display = 'none';
+    
+    if (userType === 'student') {
+      studentIdGroup.style.display = 'block';
+    } else if (userType === 'teacher') {
+      facultyIdGroup.style.display = 'block';
+    }
+    // Staff/Admin - no ID field shown
+  }
+  
+  // Initialize on page load
+  toggleStudentId();
+</script>
+</section>
+{% endblock %}

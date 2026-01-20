@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Student IDs - EcoDrop</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .qr-code { font-family: monospace; background: #f9f9f9; padding: 4px; }
+        .no-qr { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Debug: Student IDs & User Lookup</h1>
+    <p><a href="{% url 'admin_dashboard' %}">&larr; Back to Admin Dashboard</a></p>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Student ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Total Points</th>
+                <th>Old QR Code</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for profile in users_with_qr %}
+            <tr>
+                <td>{{ profile.user.username }}</td>
+                <td>
+                    {% if profile.school_id %}
+                        <strong style="color: green;">{{ profile.school_id }}</strong>
+                    {% else %}
+                        <span class="no-qr">NO STUDENT ID</span>
+                    {% endif %}
+                </td>
+                <td>{{ profile.user.first_name }}</td>
+                <td>{{ profile.user.last_name }}</td>
+                <td>{{ profile.user.email }}</td>
+                <td>{{ profile.total_points }}</td>
+                <td>
+                    {% if profile.qr_code_data %}
+                        <span class="qr-code">{{ profile.qr_code_data }}</span>
+                    {% else %}
+                        <span style="color: gray;">-</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">No users found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <h2>Instructions:</h2>
+    <ol>
+        <li><strong>Setup student IDs:</strong> <code>python manage.py fix_qr_codes</code></li>
+        <li><strong>Set specific student ID:</strong> <code>python manage.py fix_qr_codes --set-student-id username:2021001234</code></li>
+        <li><strong>Test with Arduino:</strong> Scan a student ID card and check Django console for debug messages</li>
+        <li><strong>The system now looks up users by:</strong>
+            <ul>
+                <li>Student ID field (primary)</li>
+                <li>Username (if student ID matches)</li>
+                <li>Old QR code (backward compatibility)</li>
+            </ul>
+        </li>
+    </ol>
+</body>
+</html>
