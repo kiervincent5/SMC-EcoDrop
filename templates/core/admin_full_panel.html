@@ -1,158 +1,249 @@
-{% extends 'base.html' %}
-{% block title %}Full Admin Panel - EcoDrop{% endblock %}
-{% block content %}
-<style>
-  .admin-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    margin-top: 20px;
-  }
-  .admin-card {
-    background: white;
-    border-radius: 10px;
-    padding: 25px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    border-left: 4px solid #4a90e2;
-    transition: transform 0.2s;
-  }
-  .admin-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-  }
-  .admin-card h3 {
-    color: #4a90e2;
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 1.3rem;
-  }
-  .admin-card p {
-    color: #666;
-    margin-bottom: 20px;
-    line-height: 1.6;
-  }
-  .card-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .action-link {
-    background: #4a90e2;
-    color: white;
-    padding: 10px 15px;
-    border-radius: 6px;
-    text-decoration: none;
-    text-align: center;
-    transition: background 0.3s;
-    display: block;
-  }
-  .action-link:hover {
-    background: #357abd;
-  }
-  .action-link.secondary {
-    background: #95a5a6;
-  }
-  .action-link.secondary:hover {
-    background: #7f8c8d;
-  }
-  .page-header {
-    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-    color: white;
-    padding: 30px;
-    border-radius: 10px;
-    margin-bottom: 30px;
-    text-align: center;
-  }
-</style>
+{% extends 'core/base_dashboard.html' %}
 
-<div class="page-header">
-  <h1><i class="fas fa-cog"></i> Full Admin Panel</h1>
-  <p style="margin: 10px 0 0 0; opacity: 0.9;">Complete system management and configuration</p>
+{% block title %}System Settings - EcoDrop{% endblock %}
+{% block page_title %}System Management{% endblock %}
+
+{% block sidebar %}
+<div class="nav-section">
+    <div class="nav-label">Administration</div>
+    <ul class="nav-list">
+        <li class="nav-item">
+            <a href="{% url 'admin_dashboard' %}">
+                <i class="fas fa-chart-line"></i> Overview
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_users' %}">
+                <i class="fas fa-users"></i> Users
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_devices' %}">
+                <i class="fas fa-microchip"></i> Devices
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_rewards' %}">
+                <i class="fas fa-gift"></i> Rewards
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_transactions' %}">
+                <i class="fas fa-exchange-alt"></i> Transactions
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_redemptions' %}">
+                <i class="fas fa-history"></i> Redemptions
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_device_logs' %}">
+                <i class="fas fa-clipboard-list"></i> System Logs
+            </a>
+        </li>
+    </ul>
 </div>
 
-<div class="admin-grid">
-  <!-- User Management -->
-  <div class="admin-card">
-    <h3><i class="fas fa-users"></i> User Management</h3>
-    <p>Manage user accounts, profiles, permissions, and student IDs</p>
-    <div class="card-actions">
-      <a href="{% url 'admin_users' %}" class="action-link">View All Users</a>
-      <a href="{% url 'admin_user_add' %}" class="action-link">Add New User</a>
-      <a href="{% url 'debug_qr_codes' %}" class="action-link secondary">Debug QR Codes</a>
-    </div>
-  </div>
-
-  <!-- Rewards Management -->
-  <div class="admin-card">
-    <h3><i class="fas fa-gift"></i> Rewards Management</h3>
-    <p>Create, edit, and manage reward items and point requirements</p>
-    <div class="card-actions">
-      <a href="{% url 'admin_rewards' %}" class="action-link">Manage Rewards</a>
-      <a href="{% url 'admin_redemptions' %}" class="action-link secondary">View Redemptions</a>
-    </div>
-  </div>
-
-  <!-- Device Management -->
-  <div class="admin-card">
-    <h3><i class="fas fa-microchip"></i> Device Management</h3>
-    <p>Monitor and configure IoT recycling devices</p>
-    <div class="card-actions">
-      <a href="{% url 'admin_devices' %}" class="action-link">Manage Devices</a>
-      <a href="{% url 'admin_device_add' %}" class="action-link">Add New Device</a>
-    </div>
-  </div>
-
-  <!-- Transaction History -->
-  <div class="admin-card">
-    <h3><i class="fas fa-chart-bar"></i> Transaction History</h3>
-    <p>View all bottle deposits and point transactions</p>
-    <div class="card-actions">
-      <a href="{% url 'admin_transactions' %}" class="action-link">View Transactions</a>
-    </div>
-  </div>
-
-  <!-- Redemption History -->
-  <div class="admin-card">
-    <h3><i class="fas fa-coins"></i> Redemption History</h3>
-    <p>Track all reward redemptions and point usage</p>
-    <div class="card-actions">
-      <a href="{% url 'admin_redemptions' %}" class="action-link">View Redemptions</a>
-    </div>
-  </div>
-
-  <!-- System Logs -->
-  <div class="admin-card">
-    <h3><i class="fas fa-clipboard-list"></i> Device Activity Logs</h3>
-    <p>Monitor device activity, errors, and system events</p>
-    <div class="card-actions">
-      <a href="{% url 'admin_device_logs' %}" class="action-link">View Device Logs</a>
-    </div>
-  </div>
-
-  <!-- Reports & Analytics -->
-  <div class="admin-card">
-    <h3><i class="fas fa-chart-line"></i> Reports & Analytics</h3>
-    <p>View system statistics and performance metrics</p>
-    <div class="card-actions">
-      <a href="{% url 'admin_dashboard' %}" class="action-link">Dashboard Overview</a>
-    </div>
-  </div>
-
-  <!-- System Settings -->
-  <div class="admin-card">
-    <h3><i class="fas fa-cog"></i> System Settings</h3>
-    <p>Configure system-wide settings and preferences</p>
-    <div class="card-actions">
-      <a href="{% url 'admin_settings' %}" class="action-link">System Settings</a>
-    </div>
-  </div>
-</div>
-
-<div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; text-align: center;">
-  <p style="color: #666; margin: 0;">
-    <strong>Need advanced features?</strong> Access the 
-    <a href="/admin/" style="color: #4a90e2; text-decoration: underline;" target="_blank">Django Admin Panel</a> 
-    for database-level management.
-  </p>
+<div class="nav-section">
+    <div class="nav-label">System</div>
+    <ul class="nav-list">
+        <li class="nav-item">
+            <a href="{% url 'admin_settings' %}">
+                <i class="fas fa-cog"></i> Settings
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_full_panel' %}" class="active">
+                <i class="fas fa-sliders-h"></i> Advanced Panel
+            </a>
+        </li>
+    </ul>
 </div>
 {% endblock %}
+
+{% block extra_styles %}
+<style>
+    .admin-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 24px;
+        margin-top: 24px;
+    }
+
+    .admin-card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        padding: 32px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .admin-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border-color: var(--primary);
+    }
+
+    .card-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: var(--bg-main);
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .card-content h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .card-content p {
+        font-size: 14px;
+        color: var(--text-muted);
+        line-height: 1.5;
+    }
+
+    .card-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: auto;
+    }
+
+    .action-btn {
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+        flex: 1;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    .btn-secondary:hover {
+        background: #e2e8f0;
+    }
+
+    .system-banner {
+        background: #fafaf9;
+        border: 1px dashed #d6d3d1;
+        border-radius: 12px;
+        padding: 24px;
+        text-align: center;
+        margin-top: 40px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-grid">
+    <!-- User Management -->
+    <div class="admin-card">
+        <div class="card-icon"><i class="fas fa-users"></i></div>
+        <div class="card-content">
+            <h3>User Management</h3>
+            <p>Administer user accounts, manage permissions, and track student identification data.</p>
+        </div>
+        <div class="card-actions">
+            <a href="{% url 'admin_users' %}" class="action-btn btn-primary">View Users</a>
+            <a href="{% url 'admin_user_add' %}" class="action-btn btn-secondary">Add New</a>
+        </div>
+    </div>
+
+    <!-- Rewards Management -->
+    <div class="admin-card">
+        <div class="card-icon"><i class="fas fa-gift"></i></div>
+        <div class="card-content">
+            <h3>Rewards Catalog</h3>
+            <p>Configure the recycling rewards inventory, point costs, and redemption policies.</p>
+        </div>
+        <div class="card-actions">
+            <a href="{% url 'admin_rewards' %}" class="action-btn btn-primary">Manage Catalog</a>
+            <a href="{% url 'admin_redemptions' %}" class="action-btn btn-secondary">Redemptions</a>
+        </div>
+    </div>
+
+    <!-- Device Management -->
+    <div class="admin-card">
+        <div class="card-icon"><i class="fas fa-microchip"></i></div>
+        <div class="card-content">
+            <h3>IoT Core</h3>
+            <p>Monitor real-time status of recycling stations and configure device parameters.</p>
+        </div>
+        <div class="card-actions">
+            <a href="{% url 'admin_devices' %}" class="action-btn btn-primary">Fleet Monitor</a>
+            <a href="{% url 'admin_device_logs' %}" class="action-btn btn-secondary">Global Logs</a>
+        </div>
+    </div>
+
+    <!-- Transaction History -->
+    <div class="admin-card">
+        <div class="card-icon"><i class="fas fa-history"></i></div>
+        <div class="card-content">
+            <h3>Data Ledger</h3>
+            <p>Comprehensive audit trail of all bottle deposits and point distributions.</p>
+        </div>
+        <div class="card-actions">
+            <a href="{% url 'admin_transactions' %}" class="action-btn btn-primary">Transaction History</a>
+        </div>
+    </div>
+
+    <!-- Reports -->
+    <div class="admin-card">
+        <div class="card-icon"><i class="fas fa-chart-pie"></i></div>
+        <div class="card-content">
+            <h3>Analytics Dashboard</h3>
+            <p>Visual reports on system performance, user engagement, and sustainability impact.</p>
+        </div>
+        <div class="card-actions">
+            <a href="{% url 'admin_dashboard' %}" class="action-btn btn-primary">Open Analytics</a>
+        </div>
+    </div>
+
+    <!-- Utilities -->
+    <div class="admin-card">
+        <div class="card-icon"><i class="fas fa-tools"></i></div>
+        <div class="card-content">
+            <h3>System Utilities</h3>
+            <p>Debug tools, QR code generators, and system-wide configuration overrides.</p>
+        </div>
+        <div class="card-actions">
+            <a href="{% url 'admin_settings' %}" class="action-btn btn-primary">Global Settings</a>
+            <a href="{% url 'debug_qr_codes' %}" class="action-btn btn-secondary">QR Debugger</a>
+        </div>
+    </div>
+</div>
+
+<div class="system-banner">
+    <p style="font-size: 14px; color: var(--text-muted);">
+        <i class="fas fa-shield-alt" style="margin-right: 8px;"></i>
+        For advanced data-level operations, please access the 
+        <a href="/admin/" style="color: var(--primary); font-weight: 600; text-decoration: none;" target="_blank">Django Technical Admin <i class="fas fa-external-link-alt" style="font-size: 10px;"></i></a>
+    </p>
+</div>
+{% endblock %}
+

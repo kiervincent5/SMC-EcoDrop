@@ -6,12 +6,28 @@
 
 {% block sidebar %}
 <div class="nav-section">
-    <div class="nav-title">navigation</div>
-    <ul>
-        <li><a href="{% url 'dashboard' %}" class="active">Dashboard</a></li>
-        <li><a href="{% url 'student_profile' %}">Profile</a></li>
-        <li><a href="{% url 'rewards' %}">Rewards</a></li>
-        <li><a href="{% url 'redemption_history' %}">Redemption History</a></li>
+    <div class="nav-label">Navigation</div>
+    <ul class="nav-list">
+        <li class="nav-item">
+            <a href="{% url 'dashboard' %}" class="active">
+                <i class="fas fa-th-large"></i> Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'student_profile' %}">
+                <i class="fas fa-id-card"></i> Profile
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'rewards' %}">
+                <i class="fas fa-gift"></i> Rewards Center
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'redemption_history' %}">
+                <i class="fas fa-history"></i> Claims History
+            </a>
+        </li>
     </ul>
 </div>
 {% endblock %}

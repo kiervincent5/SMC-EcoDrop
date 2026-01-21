@@ -1,98 +1,132 @@
 {% extends 'core/base_dashboard.html' %}
+
 {% block title %}Edit Device - Admin Console{% endblock %}
+{% block page_title %}Network Infrastructure{% endblock %}
 
 {% block sidebar %}
 <div class="nav-section">
-    <div class="nav-title">navigation</div>
-    <ul>
-        <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
-        <li><a href="{% url 'admin_users' %}">Manage Users</a></li>
-        <li><a href="{% url 'admin_user_add' %}">Add User</a></li>
-        <li><a href="{% url 'admin_devices' %}" class="active">Devices</a></li>
-        <li><a href="{% url 'admin_rewards' %}">Rewards</a></li>
+    <div class="nav-label">Administration</div>
+    <ul class="nav-list">
+        <li class="nav-item">
+            <a href="{% url 'admin_dashboard' %}">
+                <i class="fas fa-chart-line"></i> Overview
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_users' %}">
+                <i class="fas fa-users"></i> Users
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_devices' %}" class="active">
+                <i class="fas fa-microchip"></i> Devices
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_rewards' %}">
+                <i class="fas fa-gift"></i> Rewards
+            </a>
+        </li>
     </ul>
 </div>
 {% endblock %}
 
 {% block extra_styles %}
 <style>
-.form-group {
-    margin-bottom: 20px;
-}
-.form-group label {
-    display: block;
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 8px;
-    font-size: 14px;
-}
-.form-input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    font-size: 14px;
-    transition: border-color 0.2s;
-}
-.form-input:focus {
-    outline: none;
-    border-color: #4a90e2;
-    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
-}
-.form-select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    font-size: 14px;
-    background: white;
-    cursor: pointer;
-}
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-.form-actions {
-    display: flex;
-    gap: 12px;
-    justify-content: flex-end;
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid #e5e7eb;
-}
-.btn {
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: none;
-    font-size: 14px;
-}
-.btn-secondary {
-    background: #f3f4f6;
-    color: #374151;
-}
-.btn-secondary:hover {
-    background: #e5e7eb;
-}
-.btn-primary {
-    background: #4a90e2;
-    color: white;
-}
-.btn-primary:hover {
-    background: #357abd;
-}
+    .form-card {
+        max-width: 640px;
+        margin: 0 auto;
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .api-key-box {
+        background: #f8fafc;
+        border: 1px solid var(--border-color);
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-family: monospace;
+        font-size: 14px;
+        color: #475569;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .btn {
+        padding: 10px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+        cursor: pointer;
+        border: 1px solid transparent;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-outline {
+        background: white;
+        border-color: var(--border-color);
+        color: var(--text-main);
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<section class="like-panel" style="max-width: 800px;">
-    <div style="margin-bottom: 24px;">
-        <h1 style="margin: 0 0 8px; font-size: 24px;"><i class="fas fa-microchip"></i> Edit Device</h1>
-        <p style="margin: 0; color: #6b7280; font-size: 14px;">Update device information and settings</p>
+<div class="card form-card">
+    <div style="margin-bottom: 32px; display: flex; align-items: center; gap: 20px;">
+        <div style="width: 56px; height: 56px; background: #eff6ff; color: var(--primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+            <i class="fas fa-microchip"></i>
+        </div>
+        <div>
+            <h1 style="font-size: 1.5rem; font-weight: 700;">Node Settings</h1>
+            <p style="color: var(--text-muted); margin-top: 4px;">Configuring network terminal <span style="color: var(--primary); font-weight: 600;">#{{ device.device_id }}</span></p>
+        </div>
     </div>
 
     <form method="post">
@@ -100,46 +134,61 @@
 
         <div class="form-row">
             <div class="form-group">
-                <label for="name">Device Name</label>
-                <input type="text" id="name" name="name" value="{{ device.name }}" class="form-input" required>
+                <label>Device Label</label>
+                <input type="text" name="name" value="{{ device.name }}" class="form-control" required>
             </div>
             <div class="form-group">
-                <label for="device_id">Device ID</label>
-                <input type="text" id="device_id" name="device_id" value="{{ device.device_id }}" class="form-input" required>
+                <label>System Identifier</label>
+                <input type="text" name="device_id" value="{{ device.device_id }}" class="form-control" required>
             </div>
         </div>
 
         <div class="form-group">
-            <label for="location">Location</label>
-            <input type="text" id="location" name="location" value="{{ device.location }}" class="form-input">
+            <label>Physical Location</label>
+            <input type="text" name="location" value="{{ device.location }}" class="form-control" required>
         </div>
 
         <div class="form-row">
             <div class="form-group">
-                <label for="status">Status</label>
-                <select id="status" name="status" class="form-select">
-                    <option value="online" {% if device.status == 'online' %}selected{% endif %}>Online</option>
-                    <option value="offline" {% if device.status == 'offline' %}selected{% endif %}>Offline</option>
-                    <option value="maintenance" {% if device.status == 'maintenance' %}selected{% endif %}>Maintenance</option>
-                    <option value="error" {% if device.status == 'error' %}selected{% endif %}>Error</option>
+                <label>Operational Status</label>
+                <select name="status" class="form-control">
+                    <option value="online" {% if device.status == 'online' %}selected{% endif %}>Active / Online</option>
+                    <option value="offline" {% if device.status == 'offline' %}selected{% endif %}>Deactivated / Offline</option>
+                    <option value="maintenance" {% if device.status == 'maintenance' %}selected{% endif %}>Maintenance Mode</option>
+                    <option value="error" {% if device.status == 'error' %}selected{% endif %}>Hardware Error</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="total_bottles_processed">Total Bottles Processed</label>
-                <input type="number" id="total_bottles_processed" name="total_bottles_processed" value="{{ device.total_bottles_processed|default:0 }}" class="form-input" min="0">
+                <label>Lifecycle Workload</label>
+                <input type="number" name="total_bottles_processed" value="{{ device.total_bottles_processed|default:0 }}" class="form-control" min="0">
             </div>
         </div>
 
         <div class="form-group">
-            <label for="api_key">API Key</label>
-            <input type="text" id="api_key" name="api_key" value="{{ device.api_key }}" class="form-input" readonly style="background: #f9fafb;">
-            <small style="color: #6b7280; font-size: 12px;">API key cannot be changed for security reasons</small>
+            <label>Authentication Token</label>
+            <div class="api-key-box">
+                <span id="apiKey">{{ device.api_key }}</span>
+                <i class="far fa-copy" style="cursor: pointer;" onclick="copyApiKey()" title="Copy to clipboard"></i>
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">
+                <i class="fas fa-lock" style="margin-right: 4px;"></i> Secure credential for Arduino MQTT/REST communication.
+            </p>
         </div>
 
         <div class="form-actions">
-            <a href="{% url 'admin_devices' %}" class="btn btn-secondary">Cancel</a>
-            <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+            <a href="{% url 'admin_devices' %}" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-primary">Sync Node Data</button>
         </div>
     </form>
-</section>
+</div>
+
+<script>
+    function copyApiKey() {
+        const key = document.getElementById('apiKey').innerText;
+        navigator.clipboard.writeText(key).then(() => {
+            alert('API Key copied to clipboard');
+        });
+    }
+</script>
 {% endblock %}
+

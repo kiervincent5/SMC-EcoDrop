@@ -77,11 +77,16 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.humanize",  # For number formatting
-    "cloudinary_storage",
-    "cloudinary",
-    "corsheaders",  # For device API CORS support
     "core",  # Our main app
 ]
+
+# Add Cloudinary only if configured (prevents startup hangs in local dev)
+if os.environ.get("CLOUDINARY_CLOUD_NAME"):
+    INSTALLED_APPS = [
+        "cloudinary_storage",
+        "cloudinary",
+    ] + INSTALLED_APPS
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

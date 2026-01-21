@@ -1,211 +1,308 @@
 {% extends 'core/base_dashboard.html' %}
 {% load static %}
-{% block title %}Teacher Profile - EcoDrop{% endblock %}
+
+{% block title %}Faculty Identity - EcoDrop{% endblock %}
+{% block page_title %}My Profile{% endblock %}
 
 {% block sidebar %}
 <div class="nav-section">
-    <div class="nav-title">navigation</div>
-    <ul>
-        <li><a href="{% url 'teacher_dashboard' %}">Dashboard</a></li>
-        <li><a href="{% url 'teacher_profile' %}" class="active">Profile</a></li>
-        <li><a href="{% url 'rewards' %}">Rewards</a></li>
-        <li><a href="{% url 'redemption_history' %}">Redemption History</a></li>
+    <div class="nav-label">Navigation</div>
+    <ul class="nav-list">
+        <li class="nav-item">
+            <a href="{% url 'teacher_dashboard' %}">
+                <i class="fas fa-th-large"></i> Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'teacher_profile' %}" class="active">
+                <i class="fas fa-id-card"></i> Profile
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'rewards' %}">
+                <i class="fas fa-gift"></i> Rewards Center
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'redemption_history' %}">
+                <i class="fas fa-history"></i> Claims History
+            </a>
+        </li>
     </ul>
 </div>
 {% endblock %}
 
 {% block extra_styles %}
 <style>
-  .cover { 
-    position: relative !important; 
-    height: 220px !important; 
-    min-height: 220px !important; 
-    overflow: hidden; 
-  }
-  .cover-img { 
-    width: 100% !important; 
-    height: 220px !important; 
-    min-height: 220px !important; 
-    object-fit: cover !important; 
-  }
-  .profile-card { 
-    position: absolute !important; 
-    left: 30px !important; 
-    bottom: 20px !important; 
-    display: flex !important; 
-    align-items: center !important; 
-    gap: 15px !important; 
-    z-index: 100 !important;
-  }
-  .avatar-pic { 
-    width: 100px !important; 
-    height: 100px !important; 
-    border-radius: 8px !important; 
-    background: #fff !important; 
-    color: #27ae60 !important; 
-    display: grid !important; 
-    place-items: center !important; 
-    font-weight: 700 !important; 
-    font-size: 40px !important; 
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
-  }
-  .profile-info .name { 
-    font-weight: 700 !important; 
-    font-size: 22px !important; 
-    color: #fff !important; 
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5) !important;
-  }
-  .profile-info .subtitle { 
-    color: #fff !important; 
-    font-size: 13px !important; 
-    margin-top: 2px !important;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.5) !important;
-  }
-  .tabs { 
-    margin: 40px 0 12px; 
-    background:#fff; 
-    border-radius: 8px; 
-    padding: 8px; 
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06); 
-    display:flex; 
-    gap:16px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .tab { 
-    padding: 10px 12px; 
-    color:#374151; 
-    text-decoration:none; 
-    border-bottom: 2px solid transparent;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-  .tab.active { border-color:#27ae60; color:#111827; }
-  .info-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 10px;
-  }
-  .info-grid .row {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    padding: 10px 0;
-    border-bottom: 1px solid #f3f4f6;
-  }
-  .info-grid .label {
-    color: #6b7280;
-    font-size: 13px;
-  }
-  .info-grid .val {
-    font-weight: 600;
-    word-break: break-word;
-  }
-  
-  /* Mobile Responsive Styles */
-  @media (max-width: 768px) {
-    .cover {
-      height: 180px !important;
-      min-height: 180px !important;
+    /* Profile Hero Section */
+    .profile-hero {
+        position: relative;
+        height: 320px;
+        border-radius: 24px;
+        overflow: hidden;
+        margin-bottom: 32px;
+        box-shadow: var(--shadow);
     }
-    .cover-img {
-      height: 180px !important;
-      min-height: 180px !important;
+
+    .hero-banner {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
-    .profile-card {
-      left: 15px !important;
-      bottom: 15px !important;
-      gap: 10px !important;
+
+    .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);
+        display: flex;
+        align-items: flex-end;
+        padding: 40px;
     }
-    .avatar-pic {
-      width: 70px !important;
-      height: 70px !important;
-      font-size: 28px !important;
+
+    .hero-content {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+        width: 100%;
     }
-    .profile-info .name {
-      font-size: 18px !important;
+
+    .hero-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 20px;
+        background: white;
+        color: #10b981;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        font-weight: 800;
+        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+        border: 4px solid rgba(255,255,255,0.2);
     }
-    .profile-info .subtitle {
-      font-size: 11px !important;
+
+    .hero-text h1 {
+        color: white;
+        font-size: 32px;
+        font-weight: 800;
+        margin: 0;
+        letter-spacing: -0.02em;
     }
-    .tabs {
-      margin: 20px 0 12px;
-      padding: 6px;
-      gap: 8px;
+
+    .hero-text p {
+        color: rgba(255,255,255,0.8);
+        font-size: 16px;
+        margin: 4px 0 0;
+        font-weight: 500;
     }
-    .tab {
-      padding: 8px 10px;
-      font-size: 14px;
+
+    /* Layout Grid */
+    .profile-grid {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 24px;
     }
-    .info-grid {
-      grid-template-columns: 1fr;
-      gap: 0;
+
+    /* Content Cards */
+    .info-card {
+        background: white;
+        border-radius: 20px;
+        border: 1px solid var(--border-color);
+        padding: 24px;
+        margin-bottom: 24px;
     }
-    .info-grid .row {
-      padding: 12px 0;
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
     }
-  }
-  
-  @media (max-width: 480px) {
-    .cover {
-      height: 150px !important;
-      min-height: 150px !important;
+
+    .card-header i {
+        color: #10b981;
+        font-size: 18px;
     }
-    .cover-img {
-      height: 150px !important;
-      min-height: 150px !important;
+
+    .card-header h3 {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-main);
+        margin: 0;
     }
-    .profile-card {
-      left: 10px !important;
-      bottom: 10px !important;
-      gap: 8px !important;
+
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
     }
-    .avatar-pic {
-      width: 60px !important;
-      height: 60px !important;
-      font-size: 24px !important;
+
+    .detail-item {
+        padding: 16px;
+        background: #f8fafc;
+        border-radius: 12px;
+        border: 1px solid #f1f5f9;
     }
-    .profile-info .name {
-      font-size: 16px !important;
+
+    .detail-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 6px;
     }
-    .profile-info .subtitle {
-      font-size: 10px !important;
+
+    .detail-value {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-main);
     }
-  }
+
+    /* Professional Summary Card */
+    .summary-card {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 32px;
+        border-radius: 20px;
+        text-align: center;
+        margin-bottom: 24px;
+    }
+
+    /* Profile Tabs */
+    .profile-tabs {
+        display: flex;
+        gap: 8px;
+        background: #f1f5f9;
+        padding: 6px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+    }
+
+    .p-tab {
+        flex: 1;
+        padding: 10px;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 600;
+        color: #64748b;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+
+    .p-tab.active {
+        background: white;
+        color: #10b981;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+
+    @media (max-width: 1024px) {
+        .profile-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .hero-overlay {
+            padding: 24px;
+        }
+        .hero-avatar {
+            width: 80px;
+            height: 80px;
+            font-size: 32px;
+        }
+        .hero-text h1 {
+            font-size: 24px;
+        }
+        .detail-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Banner / Cover -->
-<section class="cover" style="position: relative !important; height: 220px !important;">
-    <img src="{% static 'core/images/smcbackground.jpg' %}" alt="Campus" class="cover-img" style="width: 100%; height: 220px; object-fit: cover;">
-    <div class="profile-card" style="position: absolute !important; left: 30px !important; bottom: 20px !important; display: flex !important; z-index: 100 !important;">
-        <div class="avatar-pic" style="width: 100px; height: 100px; border-radius: 8px; background: #fff; color: #4a90e2; display: grid; place-items: center; font-weight: 700; font-size: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">{{ user.first_name|default:user.username|first|upper }}</div>
-        <div class="profile-info" style="display: flex; flex-direction: column; justify-content: center;">
-            <div class="name" style="font-weight: 700; font-size: 22px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">{{ user.get_full_name|default:user.username }}</div>
-            <div class="subtitle" style="color: #fff; font-size: 13px; margin-top: 2px; text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Teacher/Faculty</div>
+<div class="profile-hero">
+    <img src="{% static 'core/images/smcbackground.jpg' %}" alt="Campus" class="hero-banner">
+    <div class="hero-overlay">
+        <div class="hero-content">
+            <div class="hero-avatar">
+                {{ user.first_name|default:user.username|first|upper }}
+            </div>
+            <div class="hero-text">
+                <h1>{{ user.get_full_name|default:user.username }}</h1>
+                <p>Academic Faculty / Staff</p>
+            </div>
         </div>
     </div>
-</section>
+</div>
 
-<!-- Tabs -->
-<nav class="tabs">
-    <a href="#" class="tab active">Personal Info</a>
-    <a href="#" class="tab">Educational Details</a>
-    <a href="#" class="tab">Family Details</a>
-    <a href="#" class="tab">Account Details</a>
-</nav>
+<div class="profile-grid">
+    <div class="profile-main">
+        <nav class="profile-tabs">
+            <a href="#" class="p-tab active">Professional Info</a>
+            <a href="#" class="p-tab">Departmental</a>
+            <a href="#" class="p-tab">Account</a>
+        </nav>
 
-<section class="like-panel">
-    <h3>About Me</h3>
-    <div class="info-grid">
-        <div class="row"><span class="label">Full Name</span><span class="val">{{ user.get_full_name|default:user.username }}</span></div>
-        <div class="row"><span class="label">Faculty ID</span><span class="val">{{ user_profile.school_id|default:"No ID" }}</span></div>
-        <div class="row"><span class="label">Gender</span><span class="val">N/A</span></div>
-        <div class="row"><span class="label">Birth Date</span><span class="val">N/A</span></div>
-        <div class="row"><span class="label">Religion</span><span class="val">N/A</span></div>
-        <div class="row"><span class="label">Nationality</span><span class="val">N/A</span></div>
+        <div class="info-card">
+            <div class="card-header">
+                <i class="fas fa-briefcase"></i>
+                <h3>Personnel Records</h3>
+            </div>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Full Name</div>
+                    <div class="detail-value">{{ user.get_full_name|default:user.username }}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Official Email</div>
+                    <div class="detail-value">{{ user.email|default:"Not Provided" }}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Faculty ID</div>
+                    <div class="detail-value">{{ user_profile.school_id|default:"No ID Assigned" }}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Classification</div>
+                    <div class="detail-value">Faculty Member</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Department</div>
+                    <div class="detail-value">Information Technology</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Institutional Role</div>
+                    <div class="detail-value">Faculty</div>
+                </div>
+            </div>
+        </div>
     </div>
-</section>
+
+    <div class="profile-sidebar">
+        <div class="summary-card">
+            <i class="fas fa-certificate" style="font-size: 32px; margin-bottom: 16px;"></i>
+            <div style="font-size: 14px; font-weight: 600; opacity: 0.9;">Institutional Standing</div>
+            <div style="font-size: 32px; font-weight: 800; margin: 12px 0;">Active</div>
+            <div style="font-size: 13px; opacity: 0.8;">Verified Faculty Member</div>
+        </div>
+
+        <div class="info-card">
+            <div class="card-header">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Quick Actions</h3>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <a href="#" class="btn-outline" style="text-align: center; padding: 12px; border-radius: 12px; text-decoration: none; font-size: 14px; font-weight: 600; border: 1px solid var(--border-color); color: var(--text-main); transition: all 0.2s;">
+                    Manage Account
+                </a>
+                <a href="#" class="btn-outline" style="text-align: center; padding: 12px; border-radius: 12px; text-decoration: none; font-size: 14px; font-weight: 600; border: 1px solid var(--border-color); color: var(--text-main); transition: all 0.2s;">
+                    Update Security
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
+

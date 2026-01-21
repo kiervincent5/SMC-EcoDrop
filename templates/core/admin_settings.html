@@ -1,117 +1,289 @@
-{% extends 'base.html' %}
-{% block title %}System Settings - Admin Console{% endblock %}
-{% block content %}
-<style>
-  .settings-section {
-    background: white;
-    border-radius: 10px;
-    padding: 25px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  }
-  .settings-section h2 {
-    color: #4a90e2;
-    margin-top: 0;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #e5e7eb;
-  }
-  .setting-item {
-    padding: 15px 0;
-    border-bottom: 1px solid #f0f0f0;
-  }
-  .setting-item:last-child {
-    border-bottom: none;
-  }
-  .setting-label {
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 5px;
-  }
-  .setting-value {
-    color: #666;
-    font-size: 0.95rem;
-  }
-  .info-box {
-    background: #e8f4f8;
-    padding: 20px;
-    border-radius: 8px;
-    border-left: 4px solid #4a90e2;
-    margin-bottom: 30px;
-  }
-</style>
+{% extends 'core/base_dashboard.html' %}
 
-<div class="card">
-  <h1><i class="fas fa-cog"></i> System Settings</h1>
-  
-  <div class="info-box">
-    <strong>System Configuration</strong><br>
-    View and manage EcoDrop system settings. For advanced configuration, use the Django admin panel.
-  </div>
+{% block title %}System Settings - EcoDrop{% endblock %}
+{% block page_title %}Global Settings{% endblock %}
 
-  <div class="settings-section">
-    <h2><i class="fas fa-bullseye"></i> Points System</h2>
-    <div class="setting-item">
-      <div class="setting-label">Points per Bottle</div>
-      <div class="setting-value">10 points (configured in API logic)</div>
-    </div>
-    <div class="setting-item">
-      <div class="setting-label">Point Redemption</div>
-      <div class="setting-value">Enabled - Users can redeem points for rewards</div>
-    </div>
-  </div>
+{% block sidebar %}
+<div class="nav-section">
+    <div class="nav-label">Administration</div>
+    <ul class="nav-list">
+        <li class="nav-item">
+            <a href="{% url 'admin_dashboard' %}">
+                <i class="fas fa-chart-line"></i> Overview
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_users' %}">
+                <i class="fas fa-users"></i> Users
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_devices' %}">
+                <i class="fas fa-microchip"></i> Devices
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_rewards' %}">
+                <i class="fas fa-gift"></i> Rewards
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_transactions' %}">
+                <i class="fas fa-exchange-alt"></i> Transactions
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_redemptions' %}">
+                <i class="fas fa-history"></i> Redemptions
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_device_logs' %}">
+                <i class="fas fa-clipboard-list"></i> System Logs
+            </a>
+        </li>
+    </ul>
+</div>
 
-  <div class="settings-section">
-    <h2><i class="fas fa-microchip"></i> IoT Device Configuration</h2>
-    <div class="setting-item">
-      <div class="setting-label">API Endpoints</div>
-      <div class="setting-value">
-        <code>/api/user/verify/</code> - User verification<br>
-        <code>/api/device/heartbeat/</code> - Device status updates<br>
-        <code>/api/device/detection/</code> - Bottle detection logging<br>
-        <code>/api/device/error/</code> - Error reporting
-      </div>
-    </div>
-    <div class="setting-item">
-      <div class="setting-label">Authentication</div>
-      <div class="setting-value">Bearer token authentication with device API keys</div>
-    </div>
-  </div>
-
-  <div class="settings-section">
-    <h2>👥 User Management</h2>
-    <div class="setting-item">
-      <div class="setting-label">QR Code Authentication</div>
-      <div class="setting-value">Enabled - Users authenticate via QR code scanning</div>
-    </div>
-    <div class="setting-item">
-      <div class="setting-label">Student ID Format</div>
-      <div class="setting-value">Supports formats like C22-0369, SMC-USER-xxx, etc.</div>
-    </div>
-  </div>
-
-  <div class="settings-section">
-    <h2><i class="fas fa-wrench"></i> System Information</h2>
-    <div class="setting-item">
-      <div class="setting-label">Application Name</div>
-      <div class="setting-value">EcoDrop - Smart Recycling System</div>
-    </div>
-    <div class="setting-item">
-      <div class="setting-label">Institution</div>
-      <div class="setting-value">St. Michael's College</div>
-    </div>
-    <div class="setting-item">
-      <div class="setting-label">Django Version</div>
-      <div class="setting-value">{{ django_version }}</div>
-    </div>
-  </div>
-
-  <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; text-align: center;">
-    <p style="color: #666; margin: 0;">
-      <strong>Need to modify system settings?</strong> Access the 
-      <a href="/admin/" style="color: #4a90e2; text-decoration: underline;" target="_blank">Django Admin Panel</a> 
-      for advanced configuration options.
-    </p>
-  </div>
+<div class="nav-section">
+    <div class="nav-label">System</div>
+    <ul class="nav-list">
+        <li class="nav-item">
+            <a href="{% url 'admin_settings' %}" class="active">
+                <i class="fas fa-cog"></i> Settings
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_full_panel' %}">
+                <i class="fas fa-sliders-h"></i> Advanced Panel
+            </a>
+        </li>
+    </ul>
 </div>
 {% endblock %}
+
+{% block extra_styles %}
+<style>
+    .settings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 24px;
+    }
+
+    .settings-group {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+    }
+
+    .settings-group-header {
+        padding: 16px 20px;
+        background: #fafafa;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .settings-group-header h2 {
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        margin: 0;
+    }
+
+    .settings-group-header i {
+        color: var(--primary);
+    }
+
+    .settings-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .setting-row {
+        padding: 20px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 24px;
+    }
+
+    .setting-row:last-child {
+        border-bottom: none;
+    }
+
+    .setting-info {
+        flex: 1;
+    }
+
+    .setting-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 4px;
+        display: block;
+    }
+
+    .setting-desc {
+        font-size: 13px;
+        color: var(--text-muted);
+        line-height: 1.5;
+    }
+
+    .setting-value {
+        font-size: 13px;
+        font-weight: 500;
+        color: #475569;
+        background: #f1f5f9;
+        padding: 4px 10px;
+        border-radius: 6px;
+    }
+
+    code {
+        padding: 2px 6px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        border-radius: 4px;
+        font-size: 12px;
+    }
+
+    .info-banner {
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 32px;
+        display: flex;
+        gap: 16px;
+        align-items: center;
+    }
+
+    .info-banner i {
+        font-size: 24px;
+        color: #059669;
+    }
+
+    .info-banner p {
+        font-size: 14px;
+        color: #064e3b;
+        margin: 0;
+        line-height: 1.5;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="info-banner">
+    <i class="fas fa-info-circle"></i>
+    <p>
+        <strong>System Configuration:</strong> These are read-only global settings for the EcoDrop system. 
+        To modify these values or access advanced database-level configurations, please use the 
+        <a href="/admin/" style="font-weight: 600; color: #059669; text-decoration: underline;">technical admin panel</a>.
+    </p>
+</div>
+
+<div class="settings-grid">
+    <!-- Points System -->
+    <div class="settings-group">
+        <div class="settings-group-header">
+            <i class="fas fa-coins"></i>
+            <h2>Economic Model</h2>
+        </div>
+        <div class="settings-list">
+            <div class="setting-row">
+                <div class="setting-info">
+                    <span class="setting-label">Points per Unit</span>
+                    <span class="setting-desc">The amount of points awarded to a user for each valid plastic bottle processed.</span>
+                </div>
+                <div class="setting-value">10 pts</div>
+            </div>
+            <div class="setting-row">
+                <div class="setting-info">
+                    <span class="setting-label">Redemption Logic</span>
+                    <span class="setting-desc">Status of the point redemption system for physical rewards in the catalog.</span>
+                </div>
+                <div class="setting-value" style="color: #059669;">Active</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- IoT Infrastructure -->
+    <div class="settings-group">
+        <div class="settings-group-header">
+            <i class="fas fa-server"></i>
+            <h2>IoT Infrastructure</h2>
+        </div>
+        <div class="settings-list">
+            <div class="setting-row">
+                <div class="setting-info">
+                    <span class="setting-label">Verification Endpoint</span>
+                    <span class="setting-desc">Internal API used by machines to identify users via QR codes.</span>
+                </div>
+                <code>/api/user/verify/</code>
+            </div>
+            <div class="setting-row">
+                <div class="setting-info">
+                    <span class="setting-label">Telemetry Heartbeat</span>
+                    <span class="setting-desc">Frequency and endpoint for machine health monitoring.</span>
+                </div>
+                <code>/api/device/heartbeat/</code>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Authentication -->
+    <div class="settings-group">
+        <div class="settings-group-header">
+            <i class="fas fa-shield-alt"></i>
+            <h2>Security & Auth</h2>
+        </div>
+        <div class="settings-list">
+            <div class="setting-row">
+                <div class="setting-info">
+                    <span class="setting-label">QR Token TTL</span>
+                    <span class="setting-desc">Time-to-live for dynamic user identification tokens.</span>
+                </div>
+                <div class="setting-value">30 Seconds</div>
+            </div>
+            <div class="setting-row">
+                <div class="setting-info">
+                    <span class="setting-label">ID Normalization</span>
+                    <span class="setting-desc">Format used for student IDs (e.g., SMC-XX-XXXX).</span>
+                </div>
+                <div class="setting-value">Regex Pattern</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Machine Assets -->
+    <div class="settings-group">
+        <div class="settings-group-header">
+            <i class="fas fa-file-invoice"></i>
+            <h2>System Information</h2>
+        </div>
+        <div class="settings-list">
+            <div class="setting-row">
+                <div class="setting-info">
+                    <span class="setting-label">Platform Engine</span>
+                    <span class="setting-desc">The underlying framework version running the EcoDrop core.</span>
+                </div>
+                <div class="setting-value">Django {{ django_version }}</div>
+            </div>
+            <div class="setting-row">
+                <div class="setting-info">
+                    <span class="setting-label">Deployment Environment</span>
+                    <span class="setting-desc">The current operational context of the application server.</span>
+                </div>
+                <div class="setting-value">Production Core</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -3,16 +3,28 @@
 
 {% block sidebar %}
 <div class="nav-section">
-    <div class="nav-title">navigation</div>
-    <ul>
-        <li><a
-                href="{% if user.is_staff %}{% url 'teacher_dashboard' %}{% else %}{% url 'dashboard' %}{% endif %}">Dashboard</a>
+    <div class="nav-label">Navigation</div>
+    <ul class="nav-list">
+        <li class="nav-item">
+            <a href="{% if user.is_staff %}{% url 'teacher_dashboard' %}{% else %}{% url 'dashboard' %}{% endif %}">
+                <i class="fas fa-th-large"></i> Dashboard
+            </a>
         </li>
-        <li><a
-                href="{% if user.is_staff %}{% url 'teacher_profile' %}{% else %}{% url 'student_profile' %}{% endif %}">Profile</a>
+        <li class="nav-item">
+            <a href="{% if user.is_staff %}{% url 'teacher_profile' %}{% else %}{% url 'student_profile' %}{% endif %}">
+                <i class="fas fa-id-card"></i> Profile
+            </a>
         </li>
-        <li><a href="{% url 'rewards' %}">Rewards</a></li>
-        <li><a href="{% url 'redemption_history' %}" class="active">Redemption History</a></li>
+        <li class="nav-item">
+            <a href="{% url 'rewards' %}">
+                <i class="fas fa-gift"></i> Rewards Center
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'redemption_history' %}" class="active">
+                <i class="fas fa-history"></i> Claims History
+            </a>
+        </li>
     </ul>
 </div>
 {% endblock %}

@@ -1,184 +1,232 @@
 {% extends 'core/base_dashboard.html' %}
-{% block title %}Add New User - Admin Console{% endblock %}
+
+{% block title %}Add User - Admin Console{% endblock %}
+{% block page_title %}New System User{% endblock %}
 
 {% block sidebar %}
 <div class="nav-section">
-    <div class="nav-title">navigation</div>
-    <ul>
-        <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
-        <li><a href="{% url 'admin_users' %}">Manage Users</a></li>
-        <li><a href="{% url 'admin_user_add' %}" class="active">Add User</a></li>
-        <li><a href="{% url 'admin_devices' %}">Devices</a></li>
-        <li><a href="{% url 'admin_rewards' %}">Rewards</a></li>
+    <div class="nav-label">Administration</div>
+    <ul class="nav-list">
+        <li class="nav-item">
+            <a href="{% url 'admin_dashboard' %}">
+                <i class="fas fa-chart-line"></i> Overview
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_users' %}" class="active">
+                <i class="fas fa-users"></i> Users
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_devices' %}">
+                <i class="fas fa-microchip"></i> Devices
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_rewards' %}">
+                <i class="fas fa-gift"></i> Rewards
+            </a>
+        </li>
     </ul>
 </div>
 {% endblock %}
 
 {% block extra_styles %}
 <style>
-  .form-container {
-    max-width: 600px;
-    margin: 0 auto;
-  }
-  .form-group {
-    margin-bottom: 20px;
-  }
-  .form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #333;
-  }
-  .form-group input[type="text"],
-  .form-group input[type="email"],
-  .form-group input[type="password"] {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 16px;
-    box-sizing: border-box;
-  }
-  .form-group input[type="checkbox"] {
-    margin-right: 8px;
-  }
-  .btn-submit {
-    background: #667eea;
-    color: white;
-    padding: 12px 30px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-right: 10px;
-  }
-  .btn-submit:hover {
-    background: #5a6fd8;
-  }
-  .btn-cancel {
-    background: #95a5a6;
-    color: white;
-    padding: 12px 30px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 16px;
-    text-decoration: none;
-    display: inline-block;
-  }
-  .btn-cancel:hover {
-    background: #7f8c8d;
-  }
-  .message {
-    padding: 12px;
-    margin: 15px 0;
-    border-radius: 6px;
-  }
-  .message-error {
-    background: #fee;
-    color: #c00;
-  }
-  .message-success {
-    background: #efe;
-    color: #060;
-  }
+    .form-card {
+        max-width: 720px;
+        margin: 0 auto;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .form-group.full-width {
+        grid-column: span 2;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .btn {
+        padding: 10px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+        cursor: pointer;
+        border: 1px solid transparent;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-hover);
+    }
+
+    .btn-outline {
+        background: white;
+        border-color: var(--border-color);
+        color: var(--text-main);
+    }
+
+    .alert {
+        padding: 12px 16px;
+        border-radius: 8px;
+        margin-bottom: 24px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .alert-error {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .alert-success {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<section class="like-panel" style="max-width: 600px;">
-  <h1><i class="fas fa-user-plus"></i> Add New User</h1>
-  
-  {% if messages %}
-    {% for message in messages %}
-      <div class="message {% if message.tags == 'error' %}message-error{% else %}message-success{% endif %}">
-        {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
-  
-  <form method="POST">
-    {% csrf_token %}
-    
-    <div class="form-group">
-      <label>Username *</label>
-      <input type="text" name="username" required>
+<div class="card form-card">
+    <div style="margin-bottom: 32px; text-align: center;">
+        <div style="width: 56px; height: 56px; background: #eff6ff; color: var(--primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 16px;">
+            <i class="fas fa-user-plus"></i>
+        </div>
+        <h1 style="font-size: 1.5rem; font-weight: 700;">Create Account</h1>
+        <p style="color: var(--text-muted); margin-top: 4px;">Register a new user to the EcoDrop platform</p>
     </div>
-    
-    <div class="form-group">
-      <label>Password *</label>
-      <input type="password" name="password" required>
-    </div>
-    
-    <div class="form-group">
-      <label>First Name</label>
-      <input type="text" name="first_name">
-    </div>
-    
-    <div class="form-group">
-      <label>Last Name</label>
-      <input type="text" name="last_name">
-    </div>
-    
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" name="email">
-    </div>
-    
-    <div class="form-group">
-      <label>User Type *</label>
-      <select name="user_type" id="user_type" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px;" onchange="toggleStudentId()">
-        <option value="student">Student</option>
-        <option value="teacher">Teacher/Faculty</option>
-        <option value="staff">Staff/Admin</option>
-      </select>
-    </div>
-    
-    <div class="form-group" id="school_id_group">
-      <label>Student ID</label>
-      <input type="text" name="school_id" id="school_id" value="{{ next_school_id }}" placeholder="e.g., C25-0001">
-      <!-- Format helper text hidden -->
-      <!-- <small style="color: #667eea; font-size: 13px; display: block; margin-top: 4px;">
-         Format: C22-0369 (C=class, 22=year, 0369=student number) | Suggested: {{ next_school_id }} | Editable
-      </small> -->
-    </div>
-    
-    <div class="form-group" id="faculty_id_group" style="display: none;">
-      <label>Faculty ID</label>
-      <input type="text" name="faculty_id" id="faculty_id" value="{{ next_faculty_id }}" placeholder="e.g., SMCIC-001-0001">
-      <!-- Format helper text hidden -->
-      <!-- <small style="color: #667eea; font-size: 13px; display: block; margin-top: 4px;">
-         Format: SMCIC-001-0001 (SMCIC=institution, 001=dept, 0001=number) | Suggested: {{ next_faculty_id }} | Editable
-      </small> -->
-    </div>
-    
-    <div style="margin-top: 30px;">
-      <button type="submit" class="btn-submit">Create User</button>
-      <a href="{% url 'admin_users' %}" class="btn-cancel">Cancel</a>
-    </div>
-  </form>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %}"></i>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Username *</label>
+                <input type="text" name="username" class="form-control" required placeholder="e.g. jdoe2024">
+            </div>
+            
+            <div class="form-group">
+                <label>Initial Password *</label>
+                <input type="password" name="password" class="form-control" required placeholder="••••••••">
+            </div>
+            
+            <div class="form-group">
+                <label>First Name</label>
+                <input type="text" name="first_name" class="form-control" placeholder="John">
+            </div>
+            
+            <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" name="last_name" class="form-control" placeholder="Doe">
+            </div>
+            
+            <div class="form-group full-width">
+                <label>Email Address</label>
+                <input type="email" name="email" class="form-control" placeholder="john.doe@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label>Account Category *</label>
+                <select name="user_type" id="user_type" class="form-control" onchange="toggleIdFields()">
+                    <option value="student">Student</option>
+                    <option value="teacher">Teacher / Faculty</option>
+                    <option value="staff">Administrative Staff</option>
+                </select>
+            </div>
+            
+            <div class="form-group" id="id_field_container">
+                <label id="id_label">Student ID</label>
+                <input type="text" name="school_id" id="school_id" value="{{ next_school_id }}" class="form-control" placeholder="C25-0001">
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <a href="{% url 'admin_users' %}" class="btn btn-outline">Discard</a>
+            <button type="submit" class="btn btn-primary">Create Account</button>
+        </div>
+    </form>
 </div>
 
 <script>
-  function toggleStudentId() {
-    const userType = document.getElementById('user_type').value;
-    const studentIdGroup = document.getElementById('school_id_group');
-    const facultyIdGroup = document.getElementById('faculty_id_group');
-    
-    // Hide both first
-    studentIdGroup.style.display = 'none';
-    facultyIdGroup.style.display = 'none';
-    
-    if (userType === 'student') {
-      studentIdGroup.style.display = 'block';
-    } else if (userType === 'teacher') {
-      facultyIdGroup.style.display = 'block';
+    function toggleIdFields() {
+        const userType = document.getElementById('user_type').value;
+        const container = document.getElementById('id_field_container');
+        const label = document.getElementById('id_label');
+        const input = document.getElementById('school_id');
+        
+        container.style.display = 'block';
+        
+        if (userType === 'student') {
+            label.textContent = 'Student ID';
+            input.name = 'school_id';
+            input.value = "{{ next_school_id }}";
+        } else if (userType === 'teacher') {
+            label.textContent = 'Faculty ID';
+            input.name = 'faculty_id';
+            input.value = "{{ next_faculty_id }}";
+        } else {
+            container.style.display = 'none';
+        }
     }
-    // Staff/Admin - no ID field shown
-  }
-  
-  // Initialize on page load
-  toggleStudentId();
+    
+    toggleIdFields();
 </script>
-</section>
 {% endblock %}
+

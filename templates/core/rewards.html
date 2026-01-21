@@ -5,16 +5,28 @@
 
 {% block sidebar %}
 <div class="nav-section">
-    <div class="nav-title">navigation</div>
-    <ul>
-        <li><a
-                href="{% if user.is_staff %}{% url 'teacher_dashboard' %}{% else %}{% url 'dashboard' %}{% endif %}">Dashboard</a>
+    <div class="nav-label">Navigation</div>
+    <ul class="nav-list">
+        <li class="nav-item">
+            <a href="{% if user.is_staff %}{% url 'teacher_dashboard' %}{% else %}{% url 'dashboard' %}{% endif %}">
+                <i class="fas fa-th-large"></i> Dashboard
+            </a>
         </li>
-        <li><a
-                href="{% if user.is_staff %}{% url 'teacher_profile' %}{% else %}{% url 'student_profile' %}{% endif %}">Profile</a>
+        <li class="nav-item">
+            <a href="{% if user.is_staff %}{% url 'teacher_profile' %}{% else %}{% url 'student_profile' %}{% endif %}">
+                <i class="fas fa-id-card"></i> Profile
+            </a>
         </li>
-        <li><a href="{% url 'rewards' %}" class="active">Rewards</a></li>
-        <li><a href="{% url 'redemption_history' %}">Redemption History</a></li>
+        <li class="nav-item">
+            <a href="{% url 'rewards' %}" class="active">
+                <i class="fas fa-gift"></i> Rewards Center
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'redemption_history' %}">
+                <i class="fas fa-history"></i> Claims History
+            </a>
+        </li>
     </ul>
 </div>
 {% endblock %}
@@ -869,7 +881,6 @@
     <h2><i class="fas fa-lightbulb"></i> How to Earn More Points</h2>
     <ul class="tips">
         <li><i class="fas fa-bottle-water"></i> Deposit 1 bottle = 10 points</li>
-        <li><i class="fas fa-recycle"></i> Use your QR code at any EcoDrop machine</li>
         <li><i class="fas fa-seedling"></i> Help save the environment while earning rewards!</li>
     </ul>
 </section>
