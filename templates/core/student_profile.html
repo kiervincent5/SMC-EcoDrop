@@ -265,23 +265,23 @@
             </div>
             <div class="detail-grid">
                 <div class="detail-item">
-                    <div class="detail-label">Legal Name</div>
+                    <div class="detail-label">Full Name</div>
                     <div class="detail-value">{{ user.get_full_name|default:user.username }}</div>
                 </div>
                 <div class="detail-item">
-                    <div class="detail-label">Email Directory</div>
+                    <div class="detail-label">Email</div>
                     <div class="detail-value">{{ user.email|default:"Not Provided" }}</div>
                 </div>
                 <div class="detail-item">
-                    <div class="detail-label">Institutional ID</div>
+                    <div class="detail-label">SMC - ID</div>
                     <div class="detail-value">{{ user_profile.school_id|default:"Awaiting Assignment" }}</div>
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">Status</div>
-                    <div class="detail-value">Active Student</div>
+                    <div class="detail-value">Active</div>
                 </div>
                 <div class="detail-item">
-                    <div class="detail-label">Academic Program</div>
+                    <div class="detail-label">Course & Year</div>
                     <div class="detail-value">BS IT - 4th Year</div>
                 </div>
                 <div class="detail-item">
@@ -294,20 +294,17 @@
 
     <div class="profile-sidebar">
         <div class="points-highlight">
-            <i class="fas fa-leaf" style="font-size: 32px; margin-bottom: 16px;"></i>
+            <i style="font-size: 32px; margin-bottom: 16px;"></i>
             <div class="points-label">Total Eco-Points Earned</div>
             <div class="points-value">{{ user_profile.total_points|default:0 }}</div>
             <div style="font-size: 13px; opacity: 0.8;">Keep recycling to grow your impact!</div>
         </div>
 
         <div class="info-card">
-            <div class="card-header">
-                <i class="fas fa-shield-alt"></i>
-                <h3>Quick Actions</h3>
-            </div>
             <div style="display: flex; flex-direction: column; gap: 12px;">
                 <a href="#" class="btn-outline" style="text-align: center; padding: 12px; border-radius: 12px; text-decoration: none; font-size: 14px; font-weight: 600; border: 1px solid var(--border-color); color: var(--text-main); transition: all 0.2s;">
                     Edit Profile
+                </a>
             </div>
         </div>
     </div>
