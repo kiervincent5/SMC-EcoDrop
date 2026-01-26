@@ -1,0 +1,41 @@
+<div class="nav-section">
+    <div class="nav-label">Navigation</div>
+    <ul class="nav-list">
+        {% if user.is_staff and not user.is_superuser %}
+            {# Teacher/Staff Sidebar #}
+            <li class="nav-item">
+                <a href="{% url 'teacher_dashboard' %}" class="{% if request.resolver_match.url_name == 'teacher_dashboard' %}active{% endif %}">
+                    <i class="fas fa-th-large"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'teacher_profile' %}" class="{% if request.resolver_match.url_name == 'teacher_profile' %}active{% endif %}">
+                    <i class="fas fa-id-card"></i> Profile
+                </a>
+            </li>
+        {% elif not user.is_staff and not user.is_superuser %}
+            {# Student Sidebar #}
+            <li class="nav-item">
+                <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <i class="fas fa-th-large"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'student_profile' %}" class="{% if request.resolver_match.url_name == 'student_profile' %}active{% endif %}">
+                    <i class="fas fa-id-card"></i> Profile
+                </a>
+            </li>
+        {% endif %}
+        
+        <li class="nav-item">
+            <a href="{% url 'rewards' %}" class="{% if request.resolver_match.url_name == 'rewards' %}active{% endif %}">
+                <i class="fas fa-gift"></i> Rewards Center
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'redemption_history' %}" class="{% if request.resolver_match.url_name == 'redemption_history' %}active{% endif %}">
+                <i class="fas fa-history"></i> Claims History
+            </a>
+        </li>
+    </ul>
+</div>

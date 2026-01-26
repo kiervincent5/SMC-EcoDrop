@@ -1,0 +1,68 @@
+<!-- Redemption Modal -->
+<div class="modal-overlay" id="redeemModal">
+    <div class="modal-box">
+        <div class="modal-header" id="modalHeaderColor">
+            <button class="modal-close" id="modalCloseBtn">&times;</button>
+            <div class="modal-icon">
+                <i class="fas fa-recycle"></i>
+            </div>
+            <div class="modal-title" id="modalRewardName">Coffee Voucher</div>
+            <div class="modal-desc">Get a free coffee at any participating location</div>
+        </div>
+        <div class="modal-body">
+            <div class="points-breakdown">
+                <div class="points-row">
+                    <span class="label">Your Current Points</span>
+                    <span class="value">{{ user_profile.total_points }} pts</span>
+                </div>
+                <div class="points-row">
+                    <span class="label">Points per Item</span>
+                    <span class="value" id="modalPointsPerItem">-50 pts</span>
+                </div>
+                <div class="points-row" style="border-bottom: 2px solid #ddd; padding-bottom: 12px;">
+                    <span class="label" style="font-weight: 600;">Quantity</span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button type="button" id="quantityDecrease"
+                            style="width: 32px; height: 32px; border: 1px solid #ddd; background: white; border-radius: 6px; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;"
+                            onmouseover="this.style.background='#f5f5f5'"
+                            onmouseout="this.style.background='white'">−</button>
+                        <input type="number" id="quantityInput" value="1" min="1" max="999"
+                            style="width: 60px; height: 32px; text-align: center; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; font-weight: 600; line-height: 32px; padding: 0;">
+                        <button type="button" id="quantityIncrease"
+                            style="width: 32px; height: 32px; border: 1px solid #ddd; background: white; border-radius: 6px; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;"
+                            onmouseover="this.style.background='#f5f5f5'"
+                            onmouseout="this.style.background='white'">+</button>
+                    </div>
+                </div>
+                <div class="points-row" style="padding-top: 12px;">
+                    <span class="label" style="font-weight: 600;">Total Required Points</span>
+                    <span class="value negative" id="modalRequiredPoints" style="font-size: 1.1rem;">-50 pts</span>
+                </div>
+                <div class="points-row">
+                    <span class="label">Points After Redemption</span>
+                    <span class="value positive" id="modalAfterPoints">75 pts</span>
+                </div>
+            </div>
+            <div class="ready-badge" id="readyBadge">
+                <i class="fas fa-check-circle"></i>
+                <div>
+                    <strong>Ready to Redeem!</strong>
+                </div>
+            </div>
+            <div class="ready-badge" id="insufficientBadge" style="display: none; background: #f8d7da; color: #721c24;">
+                <i class="fas fa-exclamation-circle"></i>
+                <div>
+                    <strong>Insufficient Points!</strong>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="modalCancelBtn">Cancel</button>
+                <form method="post" id="redeemForm" style="flex: 1; margin: 0;">
+                    {% csrf_token %}
+                    <input type="hidden" name="quantity" id="quantityHiddenInput" value="1">
+                    <button type="submit" class="modal-btn confirm" id="confirmRedeemBtn">Confirm Redemption</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

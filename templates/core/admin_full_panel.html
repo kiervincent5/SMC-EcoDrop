@@ -1,162 +1,15 @@
 {% extends 'core/base_dashboard.html' %}
 
+{% load static %}
 {% block title %}System Settings - EcoDrop{% endblock %}
 {% block page_title %}System Management{% endblock %}
 
 {% block sidebar %}
-<div class="nav-section">
-    <div class="nav-label">Administration</div>
-    <ul class="nav-list">
-        <li class="nav-item">
-            <a href="{% url 'admin_dashboard' %}">
-                <i class="fas fa-chart-line"></i> Overview
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_users' %}">
-                <i class="fas fa-users"></i> Users
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_devices' %}">
-                <i class="fas fa-microchip"></i> Devices
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_rewards' %}">
-                <i class="fas fa-gift"></i> Rewards
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_transactions' %}">
-                <i class="fas fa-exchange-alt"></i> Transactions
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_redemptions' %}">
-                <i class="fas fa-history"></i> Redemptions
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_device_logs' %}">
-                <i class="fas fa-clipboard-list"></i> System Logs
-            </a>
-        </li>
-    </ul>
-</div>
-
-<div class="nav-section">
-    <div class="nav-label">System</div>
-    <ul class="nav-list">
-        <li class="nav-item">
-            <a href="{% url 'admin_settings' %}">
-                <i class="fas fa-cog"></i> Settings
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_full_panel' %}" class="active">
-                <i class="fas fa-sliders-h"></i> Advanced Panel
-            </a>
-        </li>
-    </ul>
-</div>
+    {% include 'core/includes/admin_sidebar.html' %}
 {% endblock %}
 
 {% block extra_styles %}
-<style>
-    .admin-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 24px;
-        margin-top: 24px;
-    }
-
-    .admin-card {
-        background: white;
-        border-radius: 16px;
-        border: 1px solid var(--border-color);
-        padding: 32px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
-
-    .admin-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        border-color: var(--primary);
-    }
-
-    .card-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        background: var(--bg-main);
-        color: var(--primary);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.25rem;
-    }
-
-    .card-content h3 {
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-bottom: 8px;
-    }
-
-    .card-content p {
-        font-size: 14px;
-        color: var(--text-muted);
-        line-height: 1.5;
-    }
-
-    .card-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-top: auto;
-    }
-
-    .action-btn {
-        padding: 10px 16px;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.2s;
-        flex: 1;
-        text-align: center;
-    }
-
-    .btn-primary {
-        background: var(--primary);
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background: var(--primary-hover);
-    }
-
-    .btn-secondary {
-        background: #f1f5f9;
-        color: #475569;
-    }
-
-    .btn-secondary:hover {
-        background: #e2e8f0;
-    }
-
-    .system-banner {
-        background: #fafaf9;
-        border: 1px dashed #d6d3d1;
-        border-radius: 12px;
-        padding: 24px;
-        text-align: center;
-        margin-top: 40px;
-    }
-</style>
+<link rel="stylesheet" href="{% static 'core/css/admin_advanced_panel.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -239,10 +92,10 @@
 </div>
 
 <div class="system-banner">
-    <p style="font-size: 14px; color: var(--text-muted);">
-        <i class="fas fa-shield-alt" style="margin-right: 8px;"></i>
+    <p class="system-banner-text">
+        <i class="fas fa-shield-alt system-banner-icon"></i>
         For advanced data-level operations, please access the 
-        <a href="/admin/" style="color: var(--primary); font-weight: 600; text-decoration: none;" target="_blank">Django Technical Admin <i class="fas fa-external-link-alt" style="font-size: 10px;"></i></a>
+        <a href="/admin/" class="technical-link" target="_blank">Django Technical Admin <i class="fas fa-external-link-alt external-icon"></i></a>
     </p>
 </div>
 {% endblock %}

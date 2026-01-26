@@ -1,330 +1,15 @@
 {% extends 'core/base_dashboard.html' %}
+{% load static %}
 
 {% block title %}User Management - Admin Console{% endblock %}
 {% block page_title %}Network Directory{% endblock %}
 
 {% block sidebar %}
-<div class="nav-section">
-    <div class="nav-label">Administration</div>
-    <ul class="nav-list">
-        <li class="nav-item">
-            <a href="{% url 'admin_dashboard' %}">
-                <i class="fas fa-chart-line"></i> Overview
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_users' %}" class="active">
-                <i class="fas fa-users"></i> Users
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_devices' %}">
-                <i class="fas fa-microchip"></i> Devices
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_rewards' %}">
-                <i class="fas fa-gift"></i> Rewards
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_transactions' %}">
-                <i class="fas fa-exchange-alt"></i> Transactions
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_redemptions' %}">
-                <i class="fas fa-history"></i> Redemptions
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_device_logs' %}">
-                <i class="fas fa-clipboard-list"></i> System Logs
-            </a>
-        </li>
-    </ul>
-</div>
-
-<div class="nav-section">
-    <div class="nav-label">System</div>
-    <ul class="nav-list">
-        <li class="nav-item">
-            <a href="{% url 'admin_settings' %}">
-                <i class="fas fa-cog"></i> Settings
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_full_panel' %}">
-                <i class="fas fa-sliders-h"></i> Advanced Panel
-            </a>
-        </li>
-    </ul>
-</div>
+    {% include 'core/includes/admin_sidebar.html' %}
 {% endblock %}
 
 {% block extra_styles %}
-<style>
-    /* Stats Row */
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 20px;
-        margin-bottom: 32px;
-    }
-
-    .stat-mini-card {
-        background: white;
-        padding: 24px;
-        border-radius: 16px;
-        border: 1px solid var(--border-color);
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .stat-mini-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-    }
-
-    .stat-icon-wrapper {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-    }
-
-    /* Filter Aesthetic */
-    .action-bar {
-        background: rgba(255, 255, 255, 0.8);
-        backdrop-filter: blur(8px);
-        padding: 24px;
-        border-radius: 16px;
-        border: 1px solid var(--border-color);
-        margin-bottom: 24px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-        flex-wrap: wrap;
-    }
-
-    .search-input-group {
-        position: relative;
-        flex: 1;
-        max-width: 400px;
-    }
-
-    .search-input-group i {
-        position: absolute;
-        left: 16px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--text-muted);
-        pointer-events: none;
-    }
-
-    .form-control {
-        width: 100%;
-        padding: 12px 16px 12px 42px;
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        font-size: 14px;
-        background: white;
-        transition: all 0.2s;
-    }
-
-    .form-control:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
-    }
-
-    .filter-controls {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-    }
-
-    .select-control {
-        padding: 10px 14px;
-        border: 1px solid var(--border-color);
-        border-radius: 10px;
-        background: white;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        min-width: 150px;
-    }
-
-    /* Premium Table */
-    .table-container {
-        background: white;
-        border-radius: 16px;
-        border: 1px solid var(--border-color);
-        overflow: hidden;
-        box-shadow: var(--shadow);
-    }
-
-    .data-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .data-table th {
-        background: #f8fafc;
-        padding: 16px 24px;
-        text-align: left;
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: #64748b;
-        border-bottom: 1px solid var(--border-color);
-    }
-
-    .data-table td {
-        padding: 18px 24px;
-        border-bottom: 1px solid var(--border-color);
-        font-size: 14px;
-        vertical-align: middle;
-    }
-
-    .data-table tbody tr {
-        transition: all 0.2s;
-    }
-
-    .data-table tbody tr:hover {
-        background: #f1f5f9;
-        transform: scale(1.002);
-    }
-
-    .identity-cell {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-    }
-
-    .avatar-circle {
-        width: 40px;
-        height: 40px;
-        border-radius: 12px;
-        background: var(--primary);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 16px;
-        box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
-    }
-
-    .user-meta h4 {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--text-main);
-        margin: 0;
-    }
-
-    .user-meta p {
-        font-size: 12px;
-        color: var(--text-muted);
-        margin: 2px 0 0;
-    }
-
-    .points-tag {
-        background: #ecfdf5;
-        color: #059669;
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-weight: 700;
-        font-size: 13px;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .role-badge {
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-size: 12px;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .role-student { background: #eff6ff; color: #1e40af; }
-    .role-faculty { background: #fff7ed; color: #c2410c; }
-    .role-admin { background: #fdf2f8; color: #be185d; }
-
-    .btn-action {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--text-muted);
-        text-decoration: none;
-        transition: all 0.2s;
-        border: 1px solid var(--border-color);
-    }
-
-    .btn-action:hover {
-        background: var(--primary);
-        color: white;
-        border-color: var(--primary);
-        transform: rotate(15deg);
-    }
-
-    /* Footer Pagination */
-    .table-footer {
-        padding: 20px 24px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-top: 1px solid var(--border-color);
-        background: #f8fafc;
-    }
-
-    .pagination {
-        display: flex;
-        gap: 8px;
-    }
-
-    .page-btn {
-        padding: 8px 16px;
-        border-radius: 10px;
-        border: 1px solid var(--border-color);
-        background: white;
-        color: var(--text-main);
-        font-size: 13px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .page-btn:hover:not(:disabled) {
-        border-color: var(--primary);
-        color: var(--primary);
-    }
-
-    .page-btn.active {
-        background: var(--primary);
-        color: white;
-        border-color: var(--primary);
-    }
-
-    .page-btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-</style>
+<link rel="stylesheet" href="{% static 'core/css/admin_tables.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -361,16 +46,16 @@
 <div class="action-bar">
     <div class="search-input-group">
         <i class="fas fa-search"></i>
-        <input type="text" id="userSearch" class="form-control" placeholder="Identify users by name, id, or email...">
+        <input type="text" id="userSearch" class="form-control-listing" placeholder="Identify users by name, id, or email...">
     </div>
     <div class="filter-controls">
-        <select id="roleFilter" class="select-control">
+        <select id="roleFilter" class="select-control-listing">
             <option value="all">Every Role</option>
             <option value="student">Students</option>
             <option value="staff">Faculty/Staff</option>
             <option value="admin">Administrators</option>
         </select>
-        <select id="pageSize" class="select-control" style="min-width: 100px;">
+        <select id="pageSize" class="select-control-listing" style="min-width: 100px;">
             <option value="10">10 Rows</option>
             <option value="25" selected>25 Rows</option>
             <option value="50">50 Rows</option>
@@ -382,7 +67,7 @@
 </div>
 
 <div class="table-container">
-    <div style="overflow-x: auto;">
+    <div class="table-responsive">
         <table class="data-table">
             <thead>
                 <tr>

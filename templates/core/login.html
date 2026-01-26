@@ -20,6 +20,11 @@
     <!-- Right fixed login panel -->
     <aside class="login-panel">
         <div class="panel-inner">
+            <div class="back-nav">
+                <a href="{% url 'home' %}">
+                    <i class="fas fa-arrow-left"></i> Back to Portal Selection
+                </a>
+            </div>
             <h2>Sign In</h2>
             
             <!-- Error Messages -->
@@ -110,6 +115,22 @@
     }
     .panel-inner { width: 82%; max-width: 420px; }
     .login-panel h2 { margin: 0 0 20px; color: #333; font-weight: 600; }
+
+    .back-nav {
+        margin-bottom: 25px;
+    }
+    .back-nav a {
+        color: #666;
+        text-decoration: none;
+        font-size: 14px;
+        transition: color 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .back-nav a:hover {
+        color: #4a90e2;
+    }
 
     .field { margin-bottom: 14px; }
     .input, input[type="text"], input[type="password"] {

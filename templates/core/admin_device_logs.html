@@ -1,132 +1,25 @@
 {% extends 'core/base_dashboard.html' %}
 
+{% load static %}
 {% block title %}Device Logs - Admin Console{% endblock %}
 {% block page_title %}System Logs{% endblock %}
 
 {% block sidebar %}
-<div class="nav-section">
-    <div class="nav-label">Administration</div>
-    <ul class="nav-list">
-        <li class="nav-item">
-            <a href="{% url 'admin_dashboard' %}">
-                <i class="fas fa-chart-line"></i> Overview
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_users' %}">
-                <i class="fas fa-users"></i> Users
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_devices' %}">
-                <i class="fas fa-microchip"></i> Devices
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_rewards' %}">
-                <i class="fas fa-gift"></i> Rewards
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_transactions' %}">
-                <i class="fas fa-exchange-alt"></i> Transactions
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_redemptions' %}">
-                <i class="fas fa-history"></i> Redemptions
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_device_logs' %}" class="active">
-                <i class="fas fa-clipboard-list"></i> System Logs
-            </a>
-        </li>
-    </ul>
-</div>
-
-<div class="nav-section">
-    <div class="nav-label">System</div>
-    <ul class="nav-list">
-        <li class="nav-item">
-            <a href="{% url 'admin_settings' %}">
-                <i class="fas fa-cog"></i> Settings
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_full_panel' %}">
-                <i class="fas fa-sliders-h"></i> Advanced Panel
-            </a>
-        </li>
-    </ul>
-</div>
+    {% include 'core/includes/admin_sidebar.html' %}
 {% endblock %}
 
 {% block extra_styles %}
-<style>
-    .table-card {
-        padding: 0;
-        overflow: hidden;
-    }
-
-    .custom-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .custom-table th {
-        text-align: left;
-        padding: 12px 16px;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: var(--text-muted);
-        border-bottom: 1px solid var(--border-color);
-        background: #fafafa;
-    }
-
-    .custom-table td {
-        padding: 14px 16px;
-        border-bottom: 1px solid var(--border-color);
-        font-size: 13px;
-        vertical-align: middle;
-    }
-
-    .custom-table tr:hover {
-        background: #f8fafc;
-    }
-
-    .badge {
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 11px;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .badge-info { background: #e0f2fe; color: #0369a1; }
-    .badge-success { background: #dcfce7; color: #166534; }
-    .badge-error { background: #fee2e2; color: #991b1b; }
-    .badge-warning { background: #fef3c7; color: #92400e; }
-    
-    .timestamp {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 12px;
-        color: var(--text-muted);
-    }
-</style>
+<link rel="stylesheet" href="{% static 'core/css/admin_tables.css' %}">
 {% endblock %}
 
 {% block content %}
-<div style="margin-bottom: 24px;">
-    <h1 style="font-size: 1.5rem; font-weight: 700;">Global Device Activity</h1>
-    <p style="color: var(--text-muted); margin-top: 4px;">Live feed of IoT events and system health</p>
+<div class="page-header">
+    <h1 class="page-title-text">Global Device Activity</h1>
+    <p class="page-subtitle-text">Live feed of IoT events and system health</p>
 </div>
 
 <div class="card table-card">
-    <div style="overflow-x: auto;">
+    <div class="table-responsive">
         <table class="custom-table">
             <thead>
                 <tr>
@@ -141,7 +34,7 @@
                 {% for log in logs %}
                 <tr>
                     <td class="timestamp">{{ log.created_at|date:"M d, H:i:s" }}</td>
-                    <td style="font-weight: 600;">{{ log.device.device_name }}</td>
+                    <td class="device-name">{{ log.device.device_name }}</td>
                     <td>
                         {% if log.log_type == 'bottle_detected' %}
                             <span class="badge badge-info"><i class="fas fa-search"></i> Detection</span>
@@ -150,30 +43,30 @@
                         {% elif log.log_type == 'error' %}
                             <span class="badge badge-error"><i class="fas fa-times-circle"></i> Error</span>
                         {% elif log.log_type == 'heartbeat' %}
-                            <span class="badge badge-info" style="background:#f1f5f9; color:#64748b;"><i class="fas fa-heartbeat"></i> Heartbeat</span>
+                            <span class="badge badge-heartbeat"><i class="fas fa-heartbeat"></i> Heartbeat</span>
                         {% else %}
-                            <span class="badge" style="background:#f1f5f9; color:#64748b;"><i class="fas fa-wrench"></i> {{ log.log_type|title }}</span>
+                            <span class="badge badge-default"><i class="fas fa-wrench"></i> {{ log.log_type|title }}</span>
                         {% endif %}
                     </td>
                     <td>
                         {% if log.sort_result == 'plastic' %}
-                            <span style="color: #059669; font-weight: 600;"><i class="fas fa-check"></i> Valid</span>
+                            <span class="result-valid"><i class="fas fa-check"></i> Valid</span>
                         {% elif log.sort_result == 'invalid' %}
-                            <span style="color: #dc2626; font-weight: 600;"><i class="fas fa-times"></i> Invalid</span>
+                            <span class="result-invalid"><i class="fas fa-times"></i> Invalid</span>
                         {% elif log.sort_result == 'error' %}
-                            <span style="color: #d97706; font-weight: 600;"><i class="fas fa-exclamation-triangle"></i> Error</span>
+                            <span class="result-error"><i class="fas fa-exclamation-triangle"></i> Error</span>
                         {% else %}
-                            <span style="color: var(--text-muted);">-</span>
+                            <span class="result-none">-</span>
                         {% endif %}
                     </td>
-                    <td style="color: var(--text-muted); max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <td class="log-message">
                         {{ log.message }}
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" style="text-align: center; padding: 60px; color: var(--text-muted);">
-                        <i class="fas fa-clipboard-list" style="font-size: 2rem; display: block; margin-bottom: 12px; opacity: 0.3;"></i>
+                    <td colspan="5" class="empty-state">
+                        <i class="fas fa-clipboard-list empty-icon"></i>
                         No activity logs recorded yet.
                     </td>
                 </tr>

@@ -1,0 +1,59 @@
+<!-- Success Modal (shown after redemption) -->
+{% if last_redemption %}
+<div class="modal-overlay active" id="successModal">
+    <div class="receipt-modal">
+        <div class="receipt-header">
+            <button class="receipt-close" id="successCloseBtn">&times;</button>
+            <div class="receipt-check"><i class="fas fa-check-circle"></i></div>
+            <div class="receipt-title">Redemption Successful!</div>
+            <div class="receipt-subtitle">Your reward is ready to use</div>
+        </div>
+        <div class="receipt-body">
+            <div class="receipt-divider"></div>
+            <div class="receipt-reward">
+                <div class="receipt-reward-name">
+                    {{ last_redemption.reward_name }}
+                    {% if last_redemption.quantity and last_redemption.quantity > 1 %}
+                    <span style="background: #4285f4; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; margin-left: 8px;">x{{ last_redemption.quantity }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="receipt-divider"></div>
+
+            <div class="receipt-number-box">
+                <div class="receipt-number-label">Receipt Number</div>
+                <div class="receipt-number-value">{{ last_redemption.receipt_number }}</div>
+            </div>
+
+            <div class="receipt-divider"></div>
+
+            <div class="receipt-info-box">
+                <div class="info-row blue">
+                    <i class="fas fa-calendar"></i>
+                    <div>
+                        <div class="info-label">Redemption Date</div>
+                        <div class="info-value">{{ last_redemption.redemption_date }}</div>
+                    </div>
+                </div>
+                <div class="info-row yellow">
+                    <i class="fas fa-clock"></i>
+                    <div>
+                        <div class="info-label">Valid Until</div>
+                        <div class="info-value">{{ last_redemption.valid_until }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="receipt-divider"></div>
+            <div class="receipt-points-deducted">
+                <span>Points Deducted</span>
+                <span class="points-value">-{{ last_redemption.points_deducted }} pts</span>
+            </div>
+            <div class="receipt-notice">
+                <i class="fas fa-info-circle"></i> Show this receipt at the canteen to claim your reward
+            </div>
+            <button class="receipt-done-btn" id="successDoneBtn">Done</button>
+        </div>
+    </div>
+</div>
+{% endif %}

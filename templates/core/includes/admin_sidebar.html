@@ -1,0 +1,56 @@
+<div class="nav-section">
+    <div class="nav-label">Administration</div>
+    <ul class="nav-list">
+        <li class="nav-item">
+            <a href="{% url 'admin_dashboard' %}" class="{% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+                <i class="fas fa-chart-line"></i> Overview
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_users' %}" class="{% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}">
+                <i class="fas fa-users"></i> Users
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_devices' %}" class="{% if request.resolver_match.url_name == 'admin_devices' %}active{% endif %}">
+                <i class="fas fa-microchip"></i> Devices
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_rewards' %}" class="{% if request.resolver_match.url_name == 'admin_rewards' %}active{% endif %}">
+                <i class="fas fa-gift"></i> Rewards
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_transactions' %}" class="{% if request.resolver_match.url_name == 'admin_transactions' %}active{% endif %}">
+                <i class="fas fa-exchange-alt"></i> Transactions
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_redemptions' %}" class="{% if request.resolver_match.url_name == 'admin_redemptions' %}active{% endif %}">
+                <i class="fas fa-history"></i> Redemptions
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_device_logs' %}" class="{% if request.resolver_match.url_name == 'admin_device_logs' %}active{% endif %}">
+                <i class="fas fa-clipboard-list"></i> System Logs
+            </a>
+        </li>
+    </ul>
+</div>
+
+<div class="nav-section">
+    <div class="nav-label">System</div>
+    <ul class="nav-list">
+        <li class="nav-item">
+            <a href="{% url 'admin_settings' %}" class="{% if request.resolver_match.url_name == 'admin_settings' %}active{% endif %}">
+                <i class="fas fa-cog"></i> Settings
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'admin_full_panel' %}" class="{% if request.resolver_match.url_name == 'admin_full_panel' %}active{% endif %}">
+                <i class="fas fa-sliders-h"></i> Advanced Panel
+            </a>
+        </li>
+    </ul>
+</div>

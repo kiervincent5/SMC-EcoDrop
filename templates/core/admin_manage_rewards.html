@@ -1,179 +1,22 @@
 {% extends 'core/base_dashboard.html' %}
+{% load static %}
 
 {% block title %}Manage Rewards - Admin Console{% endblock %}
 {% block page_title %}Rewards Management{% endblock %}
 
 {% block sidebar %}
-<div class="nav-section">
-    <div class="nav-label">Administration</div>
-    <ul class="nav-list">
-        <li class="nav-item">
-            <a href="{% url 'admin_dashboard' %}">
-                <i class="fas fa-chart-line"></i> Overview
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_users' %}">
-                <i class="fas fa-users"></i> Users
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_devices' %}">
-                <i class="fas fa-microchip"></i> Devices
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_rewards' %}" class="active">
-                <i class="fas fa-gift"></i> Rewards
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_transactions' %}">
-                <i class="fas fa-exchange-alt"></i> Transactions
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_redemptions' %}">
-                <i class="fas fa-history"></i> Redemptions
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_device_logs' %}">
-                <i class="fas fa-clipboard-list"></i> System Logs
-            </a>
-        </li>
-    </ul>
-</div>
-
-<div class="nav-section">
-    <div class="nav-label">System</div>
-    <ul class="nav-list">
-        <li class="nav-item">
-            <a href="{% url 'admin_settings' %}">
-                <i class="fas fa-cog"></i> Settings
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'admin_full_panel' %}">
-                <i class="fas fa-sliders-h"></i> Advanced Panel
-            </a>
-        </li>
-    </ul>
-</div>
+    {% include 'core/includes/admin_sidebar.html' %}
 {% endblock %}
 
 {% block extra_styles %}
-<style>
-    .table-card {
-        padding: 0;
-        overflow: hidden;
-    }
-
-    .custom-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .custom-table th {
-        text-align: left;
-        padding: 12px 16px;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: var(--text-muted);
-        border-bottom: 1px solid var(--border-color);
-        background: #fafafa;
-    }
-
-    .custom-table td {
-        padding: 16px;
-        border-bottom: 1px solid var(--border-color);
-        font-size: 14px;
-        vertical-align: middle;
-    }
-
-    .custom-table tr:hover {
-        background: #f8fafc;
-    }
-
-    .reward-img-wrapper {
-        width: 48px;
-        height: 48px;
-        border-radius: 8px;
-        overflow: hidden;
-        background: #f1f5f9;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid var(--border-color);
-    }
-
-    .reward-img-wrapper img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .points-badge {
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 13px;
-        font-weight: 700;
-        background: #ecfdf5;
-        color: #059669;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-    }
-
-    .btn-manage {
-        padding: 6px 12px;
-        border-radius: 6px;
-        background: white;
-        border: 1px solid var(--border-color);
-        color: var(--text-main);
-        text-decoration: none;
-        font-size: 13px;
-        font-weight: 500;
-        transition: all 0.2s;
-    }
-
-    .btn-manage:hover {
-        background: var(--bg-main);
-        border-color: #cbd5e1;
-    }
-
-    .page-header-actions {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
-    }
-
-    .btn-primary {
-        background: var(--primary);
-        color: white;
-        padding: 10px 18px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-size: 14px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .btn-primary:hover {
-        background: var(--primary-hover);
-    }
-</style>
+<link rel="stylesheet" href="{% static 'core/css/admin_tables.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="page-header-actions">
     <div>
-        <h1 style="font-size: 1.5rem; font-weight: 700;">Rewards Catalog</h1>
-        <p style="color: var(--text-muted); margin-top: 4px;">Update items and point requirements</p>
+        <h1 class="page-title-text">Rewards Catalog</h1>
+        <p class="page-subtitle-text">Update items and point requirements</p>
     </div>
     <a href="{% url 'admin_reward_add' %}" class="btn-primary">
         <i class="fas fa-plus"></i> Add Reward
@@ -181,7 +24,7 @@
 </div>
 
 <div class="card table-card">
-    <div style="overflow-x: auto;">
+    <div class="table-responsive">
         <table class="custom-table">
             <thead>
                 <tr>
@@ -203,9 +46,9 @@
                             {% endif %}
                         </div>
                     </td>
-                    <td style="font-weight: 600;">{{ r.reward_name }}</td>
+                    <td class="device-name">{{ r.reward_name }}</td>
                     <td>
-                        <span class="points-badge">
+                        <span class="points-tag">
                             <i class="fas fa-star" style="font-size: 10px;"></i>
                             {{ r.points_required }} pts
                         </span>
@@ -216,8 +59,8 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="4" style="text-align: center; padding: 60px; color: var(--text-muted);">
-                        <i class="fas fa-gift" style="font-size: 2rem; display: block; margin-bottom: 12px; opacity: 0.3;"></i>
+                    <td colspan="4" class="empty-state">
+                        <i class="fas fa-gift empty-icon"></i>
                         No rewards found in the catalog.
                     </td>
                 </tr>

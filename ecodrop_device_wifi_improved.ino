@@ -13,16 +13,16 @@ const char* WIFI_SSID = "Vince";
 const char* WIFI_PASS = "vinceba1";
 
 // PRODUCTION: Railway deployment - HTTPS (Port 443)
-const char* API_HOST  = "smc-ecodrop.up.railway.app";  // Your Railway URL
-const uint16_t API_PORT = 443;                        // HTTPS port
-const bool USE_HTTPS = true;                          // Use HTTPS for production
+//const char* API_HOST  = "smc-ecodrop.up.railway.app";  // Your Railway URL
+//const uint16_t API_PORT = 443;                        // HTTPS port
+//const bool USE_HTTPS = true;                          // Use HTTPS for production
 
 // LOCAL TESTING: Uncomment these 3 lines and comment out production above when testing locally
-// const char* API_HOST  = "10.62.179.225";   // Your PC LAN IP
-// const uint16_t API_PORT = 8000;            // Local Django dev server port
-// const bool USE_HTTPS = false;              // Use HTTP for local testing
+ const char* API_HOST  = "10.147.230.225";   // Your PC LAN IP
+ const uint16_t API_PORT = 8000;            // Local Django dev server port
+ const bool USE_HTTPS = false;              // Use HTTP for local testing
 
-const char* API_KEY  = "abe58673-8bc1-4d91-8245-022b3858b0d4";           // same as Device.device_id in Django
+const char* API_KEY  = "a4595382-edde-4a05-aa01-171afacc97c8";           // same as Device.device_id in Django
 const char* API_DEVICE_HEARTBEAT_PATH = "/api/device/heartbeat/";
 const char* API_DEVICE_DETECT_PATH    = "/api/device/detection/";
 const char* API_USER_VERIFY_PATH      = "/api/user/verify/";    // added: user verify endpoint
@@ -36,7 +36,8 @@ const int     ECHO_PIN  = D4;   // Ultrasonic echo pin
 const int     CAP_PIN   = D6;   // Capacitive sensor, HIGH near material (non-plastic on your PNP interface)
 const int     SERVO_PIN = D7;   // Servo signal
 const int     BUZZER_PIN= D0;   // Active buzzer (+) to D0, (−) to GND
-const int     SCANNER_TRIGGER_PIN = D5;  // QR Scanner auto-trigger button
+const uint8_t SCANNER_TRIGGER_PIN = D8;  // MOVED to D8
+const uint8_t INDUCTIVE_PIN = D5;        // NEW: Inductive on D5
 
 // ===== LCD =====
 hd44780_I2Cexp lcd;
@@ -51,7 +52,7 @@ unsigned long servoHoldUntil = 0;
 int servoTarget = CENTER_POS;
 
 // ===== DEBOUNCE / TIMING =====
-const unsigned long CAP_CONFIRM_MS   = 40;
+const unsigned long CAP_CONFIRM_MS   = 10;
 const unsigned long ULTRASONIC_CONFIRM_MS = 50;
 const unsigned long RELATCH_MS       = 800;
 
@@ -103,11 +104,28 @@ unsigned long detectionStart = 0;
 unsigned long lastProcessedAt = 0;  // Track when last bottle was processed
 unsigned long lastLcdAt = 0;
 
-// ===== Scanner Auto-Trigger =====
+int inductiveStable = LOW, inductiveLast = LOW;
+unsigned long inductiveChangedAt = 0;
+
+// ===== Scanner Auto-Trigger (Non-Blocking) =====
+unsigned long scannerTriggerEnd = 0;
+bool scannerTriggerActive = false;
+
 void triggerScanner() {
-  digitalWrite(SCANNER_TRIGGER_PIN, LOW);   // Press button (connect to GND)
-  delay(100);                                // Hold for 100ms
-  digitalWrite(SCANNER_TRIGGER_PIN, HIGH);  // Release button
+  if (!scannerTriggerActive) {
+    digitalWrite(SCANNER_TRIGGER_PIN, LOW);   // Press button (connect to GND)
+    scannerTriggerActive = true;
+    scannerTriggerEnd = millis() + 5000;      // Hold for 5 seconds
+    Serial.println("SCANNER: Trigger pulse started (5s)");
+  }
+}
+
+void serviceScannerTrigger() {
+  if (scannerTriggerActive && millis() >= scannerTriggerEnd) {
+    digitalWrite(SCANNER_TRIGGER_PIN, HIGH);  // Release button
+    scannerTriggerActive = false;
+    Serial.println("SCANNER: Trigger pulse ended");
+  }
 }
 
 // ===== LCD helpers =====
@@ -176,19 +194,17 @@ void connectWiFi() {
 }
 
 int httpGET(const String& url, const char* apiKey, String& respOut) {
-  HTTPClient http;
+  WiFiClient client;
+  WiFiClientSecure secureClient;
   bool success = false;
   
   Serial.print(USE_HTTPS ? "HTTPS" : "HTTP");
   Serial.print(": Attempting connection to: "); Serial.println(url);
   
-  // Use HTTPS (WiFiClientSecure) or HTTP (WiFiClient) based on configuration
   if (USE_HTTPS) {
-    WiFiClientSecure secureClient;
-    secureClient.setInsecure();  // Skip certificate verification for simplicity
+    secureClient.setInsecure();
     success = http.begin(secureClient, url);
   } else {
-    WiFiClient client;
     success = http.begin(client, url);
   }
   
@@ -197,7 +213,7 @@ int httpGET(const String& url, const char* apiKey, String& respOut) {
     return -1;
   }
   
-  http.setTimeout(10000);  // 10 second timeout
+  http.setTimeout(10000);
   http.addHeader("User-Agent", "EcoDrop-Arduino/1.0");
   if (apiKey && apiKey[0]) {
     http.addHeader("Authorization", String("Bearer ") + apiKey);
@@ -220,16 +236,14 @@ int httpGET(const String& url, const char* apiKey, String& respOut) {
 }
 
 int httpPOSTjson(const String& url, const char* apiKey, const String& jsonBody, String& respOut) {
-  HTTPClient http;
+  WiFiClient client;
+  WiFiClientSecure secureClient;
   bool success = false;
   
-  // Use HTTPS (WiFiClientSecure) or HTTP (WiFiClient) based on configuration
   if (USE_HTTPS) {
-    WiFiClientSecure secureClient;
-    secureClient.setInsecure();  // Skip certificate verification for simplicity
+    secureClient.setInsecure();
     success = http.begin(secureClient, url);
   } else {
-    WiFiClient client;
     success = http.begin(client, url);
   }
   
@@ -390,53 +404,51 @@ void processBottleDetection(){
   // Check sensor states after detection delay
   bool ultrasonicDetected = ultrasonicStable;
   bool capacitiveDetected = (capStable == HIGH);
+  bool inductiveDetected  = (inductiveStable == HIGH); // Metal detector
   
   String sortResult;
   bool isAccepted = false;
   
-  if (ultrasonicDetected && capacitiveDetected) {
-    // Both sensors detected - REJECT (NO SERVO MOVEMENT)
+  if (inductiveDetected) {
+    // 1. METAL DETECTION (Highest priority)
     sortResult = "invalid";
     isAccepted = false;
-    
-    lcdTop("Not plastic!");
-    lcdBottom("Try again");
-    delay(1500);  // Show error message longer
-    buzzReject(); // 3 second buzz
-    // Servo stays in CENTER - no movement for rejected items
-    
-  } else if (ultrasonicDetected && !capacitiveDetected) {
-    // Only ultrasonic detected - ACCEPT
+    lcdTop("Metal detected!");
+    lcdBottom("No cans allowed");
+    delay(2000);
+    buzzReject();
+  } else if (ultrasonicDetected && capacitiveDetected) {
+    // 2. PLASTIC DETECTION (Object present + Non-metal material confirmed)
     sortResult = "plastic";
     isAccepted = true;
-    
     lcdTop("Plastic bottle");
     lcdBottom("detected!");
-    beepAccept(); // Single beep
+    beepAccept();
     servoActuate(RIGHT_POS, ACTION_HOLD_MS);
-    delay(2000);  // Show detection longer
-    
+    delay(2000);
     lcdTop("Adding points");
     lcdBottom("to " + currentUserName.substring(0,12));
-    delay(2500);  // Show points message longer
-    
+    delay(2500);
+  } else if (ultrasonicDetected && !capacitiveDetected) {
+    // 3. OTHER OBJECTS (Object present but ignored by Capacitive sensor)
+    sortResult = "invalid";
+    isAccepted = false;
+    lcdTop("Not plastic!");
+    lcdBottom("Cannot verify");
+    delay(2000);
+    buzzReject();
   } else {
-    // No valid detection - ignore
+    // No valid detection
     showInsertPrompt();
     verifiedDeadline = millis() + VERIFIED_IDLE_TIMEOUT_MS;
     detectionActive = false;
     return;
   }
   
-  // Log the detection
   sendBottleDetection(sortResult, 0, currentUser);
-  
-  // Return to insert prompt (timer keeps running)
   showInsertPrompt();
-  
-  // Reset detection state with cooldown to prevent immediate re-detection
   detectionActive = false;
-  lastProcessedAt = millis();  // Mark processing time for cooldown
+  lastProcessedAt = millis();
 }
 
 // ===== Inputs =====
@@ -475,9 +487,16 @@ void debounceInputs(){
 
   // CAP
   int capRead = digitalRead(CAP_PIN);
-  if (capRead != capLast){ capLast = capRead; capChangedAt = now; }
+  if (capRead != capLast){ capLast = capLast; capChangedAt = now; }
   if (capRead != capStable && (now - capChangedAt) >= CAP_CONFIRM_MS){
     capStable = capRead;
+  }
+
+  // INDUCTIVE (METAL)
+  int indRead = digitalRead(INDUCTIVE_PIN);
+  if (indRead != inductiveLast){ inductiveLast = indRead; inductiveChangedAt = now; }
+  if (indRead != inductiveStable && (now - inductiveChangedAt) >= CAP_CONFIRM_MS){
+    inductiveStable = indRead;
   }
 }
 
@@ -492,7 +511,7 @@ void handleDetection(){
     // Check if cooldown period has passed since last processing
     bool cooldownPassed = (now - lastProcessedAt) >= COOLDOWN_AFTER_PROCESS_MS;
     
-    if (cooldownPassed && (ultrasonicStable || capStable == HIGH)){
+    if (cooldownPassed && (ultrasonicStable || capStable == HIGH || inductiveStable == HIGH)){
       detectionActive = true;
       detectionStart = now;
       // Reset timer on bottle insertion attempt
@@ -535,6 +554,7 @@ void setup(){
   lcd.clear();
 
   pinMode(CAP_PIN, INPUT);
+  pinMode(INDUCTIVE_PIN, INPUT); // NEW
   pinMode(TRIG_PIN, OUTPUT);
   pinMode(ECHO_PIN, INPUT);
   pinMode(BUZZER_PIN, OUTPUT);
@@ -626,5 +646,6 @@ void loop(){
   }
 
   serviceServo();
+  serviceScannerTrigger(); // Handle the non-blocking pulse
   yield();
 }

@@ -1,225 +1,14 @@
 {% extends 'core/base_dashboard.html' %}
 {% load static %}
-
 {% block title %}Faculty Identity - EcoDrop{% endblock %}
 {% block page_title %}My Profile{% endblock %}
 
 {% block sidebar %}
-<div class="nav-section">
-    <div class="nav-label">Navigation</div>
-    <ul class="nav-list">
-        <li class="nav-item">
-            <a href="{% url 'teacher_dashboard' %}">
-                <i class="fas fa-th-large"></i> Dashboard
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'teacher_profile' %}" class="active">
-                <i class="fas fa-id-card"></i> Profile
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'rewards' %}">
-                <i class="fas fa-gift"></i> Rewards Center
-            </a>
-        </li>
-        <li class="nav-item">
-            <a href="{% url 'redemption_history' %}">
-                <i class="fas fa-history"></i> Claims History
-            </a>
-        </li>
-    </ul>
-</div>
+    {% include 'core/includes/user_sidebar.html' %}
 {% endblock %}
 
 {% block extra_styles %}
-<style>
-    /* Profile Hero Section */
-    .profile-hero {
-        position: relative;
-        height: 320px;
-        border-radius: 24px;
-        overflow: hidden;
-        margin-bottom: 32px;
-        box-shadow: var(--shadow);
-    }
-
-    .hero-banner {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .hero-overlay {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);
-        display: flex;
-        align-items: flex-end;
-        padding: 40px;
-    }
-
-    .hero-content {
-        display: flex;
-        align-items: center;
-        gap: 28px;
-        width: 100%;
-    }
-
-    .hero-avatar {
-        width: 120px;
-        height: 120px;
-        border-radius: 20px;
-        background: white;
-        color: #10b981;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 48px;
-        font-weight: 800;
-        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
-        border: 4px solid rgba(255,255,255,0.2);
-    }
-
-    .hero-text h1 {
-        color: white;
-        font-size: 32px;
-        font-weight: 800;
-        margin: 0;
-        letter-spacing: -0.02em;
-    }
-
-    .hero-text p {
-        color: rgba(255,255,255,0.8);
-        font-size: 16px;
-        margin: 4px 0 0;
-        font-weight: 500;
-    }
-
-    /* Layout Grid */
-    .profile-grid {
-        display: grid;
-        grid-template-columns: 1fr 340px;
-        gap: 24px;
-    }
-
-    /* Content Cards */
-    .info-card {
-        background: white;
-        border-radius: 20px;
-        border: 1px solid var(--border-color);
-        padding: 24px;
-        margin-bottom: 24px;
-    }
-
-    .card-header {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 24px;
-    }
-
-    .card-header i {
-        color: #10b981;
-        font-size: 18px;
-    }
-
-    .card-header h3 {
-        font-size: 16px;
-        font-weight: 700;
-        color: var(--text-main);
-        margin: 0;
-    }
-
-    .detail-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-    }
-
-    .detail-item {
-        padding: 16px;
-        background: #f8fafc;
-        border-radius: 12px;
-        border: 1px solid #f1f5f9;
-    }
-
-    .detail-label {
-        font-size: 11px;
-        font-weight: 700;
-        color: #64748b;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin-bottom: 6px;
-    }
-
-    .detail-value {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--text-main);
-    }
-
-    /* Professional Summary Card */
-    .summary-card {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        color: white;
-        padding: 32px;
-        border-radius: 20px;
-        text-align: center;
-        margin-bottom: 24px;
-    }
-
-    /* Profile Tabs */
-    .profile-tabs {
-        display: flex;
-        gap: 8px;
-        background: #f1f5f9;
-        padding: 6px;
-        border-radius: 12px;
-        margin-bottom: 24px;
-    }
-
-    .p-tab {
-        flex: 1;
-        padding: 10px;
-        text-align: center;
-        font-size: 13px;
-        font-weight: 600;
-        color: #64748b;
-        text-decoration: none;
-        border-radius: 8px;
-        transition: all 0.2s;
-    }
-
-    .p-tab.active {
-        background: white;
-        color: #10b981;
-        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-    }
-
-    @media (max-width: 1024px) {
-        .profile-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    @media (max-width: 640px) {
-        .hero-overlay {
-            padding: 24px;
-        }
-        .hero-avatar {
-            width: 80px;
-            height: 80px;
-            font-size: 32px;
-        }
-        .hero-text h1 {
-            font-size: 24px;
-        }
-        .detail-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
+<link rel="stylesheet" href="{% static 'core/css/user_profile.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -241,15 +30,15 @@
 <div class="profile-grid">
     <div class="profile-main">
         <nav class="profile-tabs">
-            <a href="#" class="p-tab active">Professional Info</a>
+            <a href="#" class="p-tab active">Identity Details</a>
             <a href="#" class="p-tab">Departmental</a>
-            <a href="#" class="p-tab">Account</a>
+            <a href="#" class="p-tab">Institutional</a>
         </nav>
 
         <div class="info-card">
             <div class="card-header">
-                <i class="fas fa-briefcase"></i>
-                <h3>Personnel Records</h3>
+                <i class="fas fa-user-circle"></i>
+                <h3>Personal Credentials</h3>
             </div>
             <div class="detail-grid">
                 <div class="detail-item">
@@ -281,24 +70,17 @@
     </div>
 
     <div class="profile-sidebar">
-        <div class="summary-card">
-            <i class="fas fa-certificate" style="font-size: 32px; margin-bottom: 16px;"></i>
-            <div style="font-size: 14px; font-weight: 600; opacity: 0.9;">Institutional Standing</div>
-            <div style="font-size: 32px; font-weight: 800; margin: 12px 0;">Active</div>
-            <div style="font-size: 13px; opacity: 0.8;">Verified Faculty Member</div>
+        <div class="profile-sidebar-card points-highlight">
+            <i class="fas fa-leaf" style="font-size: 32px; margin-bottom: 16px;"></i>
+            <div class="points-label">Total Eco-Points Earned</div>
+            <div class="points-value">{{ user_profile.total_points|default:0 }}</div>
+            <div style="font-size: 13px; opacity: 0.8;">Keep recycling to grow your impact!</div>
         </div>
 
         <div class="info-card">
-            <div class="card-header">
-                <i class="fas fa-shield-alt"></i>
-                <h3>Quick Actions</h3>
-            </div>
             <div style="display: flex; flex-direction: column; gap: 12px;">
-                <a href="#" class="btn-outline" style="text-align: center; padding: 12px; border-radius: 12px; text-decoration: none; font-size: 14px; font-weight: 600; border: 1px solid var(--border-color); color: var(--text-main); transition: all 0.2s;">
-                    Manage Account
-                </a>
-                <a href="#" class="btn-outline" style="text-align: center; padding: 12px; border-radius: 12px; text-decoration: none; font-size: 14px; font-weight: 600; border: 1px solid var(--border-color); color: var(--text-main); transition: all 0.2s;">
-                    Update Security
+                <a href="#" class="profile-btn-outline">
+                    Edit Profile
                 </a>
             </div>
         </div>

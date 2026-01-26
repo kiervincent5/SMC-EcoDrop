@@ -13,12 +13,17 @@ from django.db import models
 from .models import UserProfile, Entry, RewardItem, RedeemedPoints, Device, DeviceLog
 from .forms import LoginForm, RegisterForm
 
-# For the API view
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.utils import timezone
 import json
 import uuid
+from .utils import (
+    get_next_available_ids,
+    authenticate_device,
+    generate_barcode_buffer,
+    generate_id_card_image,
+)
 
 
 def home_view(request):
@@ -719,7 +724,9 @@ def admin_device_edit_view(request, device_id: int):
         return redirect("admin_devices")
 
     if request.method == "POST":
-        device.name = request.POST.get("name", device.name).strip() or device.name
+        device.device_name = (
+            request.POST.get("name", device.device_name).strip() or device.device_name
+        )
         device.device_id = (
             request.POST.get("device_id", device.device_id).strip() or device.device_id
         )
@@ -759,49 +766,8 @@ def admin_user_add_view(request):
     if not request.user.is_staff:
         return redirect("dashboard")
 
-    # Generate next available IDs for display
-    from datetime import datetime
-
-    current_year = str(datetime.now().year)[
-        2:
-    ]  # Get last 2 digits of year (e.g., "25" for 2025)
-
-    # Get next student ID
-    last_student = (
-        UserProfile.objects.filter(school_id__startswith=f"C{current_year}-")
-        .order_by("-school_id")
-        .first()
-    )
-
-    if last_student and last_student.school_id:
-        try:
-            last_num = int(last_student.school_id.split("-")[1])
-            next_school_id = f"C{current_year}-{str(last_num + 1).zfill(4)}"
-        except:
-            next_school_id = f"C{current_year}-0001"
-    else:
-        next_school_id = f"C{current_year}-0001"
-
-    # Get next faculty ID (SMCIC-XXX-YYYY format)
-    current_year = str(datetime.now().year)  # Full year (e.g., "2025")
-    last_faculty = (
-        UserProfile.objects.filter(school_id__startswith="SMCIC-")
-        .order_by("-school_id")
-        .first()
-    )
-
-    if last_faculty and last_faculty.school_id:
-        try:
-            parts = last_faculty.school_id.split("-")
-            if len(parts) == 3:
-                last_num = int(parts[1])
-                next_faculty_id = f"SMCIC-{str(last_num + 1).zfill(3)}-{current_year}"
-            else:
-                next_faculty_id = f"SMCIC-001-{current_year}"
-        except:
-            next_faculty_id = f"SMCIC-001-{current_year}"
-    else:
-        next_faculty_id = f"SMCIC-001-{current_year}"
+    # Use utility helper to get next IDs
+    next_school_id, next_faculty_id = get_next_available_ids()
 
     if request.method == "POST":
         username = request.POST.get("username", "").strip()
@@ -991,17 +957,7 @@ def admin_settings_view(request):
 # --- API Views for IoT Device Integration ---
 
 
-def authenticate_device(request):
-    """Helper function to authenticate device API requests"""
-    auth_header = request.headers.get("Authorization")
-    if not auth_header or not auth_header.startswith("Bearer "):
-        return None
-
-    api_key = auth_header.split(" ")[1]
-    try:
-        return Device.objects.get(api_key=api_key)
-    except Device.DoesNotExist:
-        return None
+# Removed - now using version imported from .utils
 
 
 @csrf_exempt
@@ -1386,9 +1342,6 @@ def debug_qr_codes_view(request):
 @login_required
 def generate_qr_code_view(request):
     """Generate barcode for the logged-in user's student ID"""
-    import barcode
-    from barcode.writer import ImageWriter
-    from io import BytesIO
     from django.http import HttpResponse
 
     user_profile = request.user.profile
@@ -1397,29 +1350,8 @@ def generate_qr_code_view(request):
     if not school_id:
         return HttpResponse("No Student ID found", status=404)
 
-    # Remove hyphens for barcode (barcodes work better with alphanumeric without special chars)
-    barcode_data = school_id.replace("-", "")
-
-    # Generate Code128 barcode (supports alphanumeric)
     try:
-        code128 = barcode.get_barcode_class("code128")
-        barcode_instance = code128(barcode_data, writer=ImageWriter())
-
-        # Save to bytes
-        buffer = BytesIO()
-        barcode_instance.write(
-            buffer,
-            options={
-                "module_width": 0.3,
-                "module_height": 15.0,
-                "quiet_zone": 6.5,
-                "font_size": 12,
-                "text_distance": 5.0,
-                "write_text": True,
-            },
-        )
-        buffer.seek(0)
-
+        buffer = generate_barcode_buffer(school_id)
         # Return as image
         response = HttpResponse(buffer, content_type="image/png")
         response["Content-Disposition"] = f'inline; filename="{school_id}_barcode.png"'
@@ -1431,103 +1363,21 @@ def generate_qr_code_view(request):
 @login_required
 def download_id_card_view(request, user_id):
     """Generate and download ID card with photo, name, ID, and barcode"""
+    from django.http import HttpResponse
+
     if not request.user.is_staff:
         return redirect("dashboard")
 
-    from PIL import Image, ImageDraw, ImageFont
-    import barcode
-    from barcode.writer import ImageWriter
-    from io import BytesIO
-    from django.http import HttpResponse
-
     try:
         user = User.objects.get(id=user_id)
-        profile = user.profile
-        school_id = profile.school_id or "NO-ID"
+        image_buffer = generate_id_card_image(user)
 
-        # Create ID card image (1012 x 638 pixels)
-        width, height = 1012, 638
-        card = Image.new("RGB", (width, height), "white")
-        draw = ImageDraw.Draw(card)
-
-        # Draw blue header
-        draw.rectangle([(0, 0), (width, 150)], fill="#1e40af")
-
-        # Add text
-        try:
-            title_font = ImageFont.truetype("arial.ttf", 40)
-            name_font = ImageFont.truetype("arial.ttf", 50)
-            info_font = ImageFont.truetype("arial.ttf", 30)
-        except:
-            title_font = ImageFont.load_default()
-            name_font = ImageFont.load_default()
-            info_font = ImageFont.load_default()
-
-        # School name
-        draw.text(
-            (width // 2, 50),
-            "St. Michael's College",
-            fill="white",
-            font=title_font,
-            anchor="mm",
-        )
-        draw.text(
-            (width // 2, 100), "Iligan City", fill="white", font=info_font, anchor="mm"
-        )
-
-        # Student name
-        full_name = (
-            f"{user.first_name} {user.last_name}".upper() or user.username.upper()
-        )
-        draw.text(
-            (width // 2, 250), full_name, fill="#1e40af", font=name_font, anchor="mm"
-        )
-
-        # Student ID
-        draw.text(
-            (width // 2, 320),
-            f"ID: {school_id}",
-            fill="black",
-            font=info_font,
-            anchor="mm",
-        )
-
-        # Generate barcode
-        barcode_data = school_id.replace("-", "")
-        code128 = barcode.get_barcode_class("code128")
-        barcode_instance = code128(barcode_data, writer=ImageWriter())
-
-        barcode_buffer = BytesIO()
-        barcode_instance.write(
-            barcode_buffer,
-            options={
-                "module_width": 0.3,
-                "module_height": 10.0,
-                "quiet_zone": 3.0,
-                "font_size": 0,
-                "write_text": False,
-            },
-        )
-        barcode_buffer.seek(0)
-
-        # Paste barcode
-        barcode_img = Image.open(barcode_buffer)
-        barcode_img = barcode_img.resize((600, 120))
-        card.paste(barcode_img, ((width - 600) // 2, 400))
-
-        # Save to response
-        response_buffer = BytesIO()
-        card.save(response_buffer, format="PNG")
-        response_buffer.seek(0)
-
-        response = HttpResponse(response_buffer, content_type="image/png")
-        response["Content-Disposition"] = (
-            f'attachment; filename="{school_id}_ID_Card.png"'
-        )
+        response = HttpResponse(image_buffer, content_type="image/png")
+        filename = f"{user.profile.school_id or 'Student'}_ID_Card.png"
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
         return response
-
     except Exception as e:
-        return HttpResponse(f"Error: {str(e)}", status=500)
+        return HttpResponse(f"Error generating ID card: {str(e)}", status=500)
 
 
 # Legacy API endpoint (kept for backward compatibility)
