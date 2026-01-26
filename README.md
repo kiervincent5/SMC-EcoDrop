@@ -68,7 +68,7 @@ ecodrop_project/
 
 6. **Access the application**:
    - Main app: http://127.0.0.1:8000/
-   - Admin panel: http://127.0.0.1:8000/admin/
+   - Admin panel: http://127.0.0.1:8000/admin_dashboard/
 
 ## Database Models
 
