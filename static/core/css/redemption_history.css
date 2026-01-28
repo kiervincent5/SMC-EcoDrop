@@ -16,21 +16,39 @@
     font-weight: 700;
 }
 
-.redemptions-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+.redemptions-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 20px !important;
+    margin-top: 20px;
+    width: 100%;
+}
+@media (max-width: 1200px) {
+    .redemptions-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+@media (max-width: 992px) {
+    .redemptions-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+@media (max-width: 576px) {
+    .redemptions-grid {
+        grid-template-columns: 1fr !important;
+    }
 }
 
 .redemption-card {
     background: white;
     border-radius: 12px;
-    padding: 20px;
+    overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    transition: transform 0.2s;
+    display: flex !important;
+    flex-direction: column !important;
+    transition: transform 0.2s, box-shadow 0.2s;
+    height: 100%;
+    border: 1px solid #eee;
 }
 
 .redemption-card:hover {
@@ -38,35 +56,56 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
-.reward-icon-box {
-    width: 80px;
-    height: 80px;
-    border-radius: 10px;
+.redemption-card-header {
+    height: 180px;
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 40px;
-    flex-shrink: 0;
+    background: #f8f9fa;
+    padding: 10px;
 }
 
-.reward-icon-box.green {
-    background: #b8e6d5;
-    color: rgba(0, 0, 0, 0.3);
+.redemption-card-header img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain;
 }
 
-.reward-icon-box.blue {
-    background: #b3d9ff;
-    color: rgba(0, 0, 0, 0.3);
+.reward-icon {
+    font-size: 60px;
+    color: rgba(0, 0, 0, 0.1);
 }
 
-.reward-icon-box.beige {
-    background: #f9dfa2;
-    color: rgba(0, 0, 0, 0.3);
+.redemption-card-header.beige { background: #f9dfa2; }
+.redemption-card-header.green { background: #b8e6d5; }
+.redemption-card-header.blue { background: #b3d9ff; }
+.redemption-card-header.purple { background: #d4c5f9; }
+
+.points-used {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #d32f2f;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.reward-icon-box.purple {
-    background: #d4c5f9;
-    color: rgba(0, 0, 0, 0.3);
+.redemption-card-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.reward-icon-box {
+    display: none; /* Removed in favor of card-header */
 }
 
 .redemption-details {
@@ -74,16 +113,31 @@
 }
 
 .reward-name-hist {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: #2c3e50;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.qty-badge {
+    background: var(--primary);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.75rem;
 }
 
 .redemption-meta {
     display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex: 1;
 }
 
 .meta-item {
@@ -98,13 +152,21 @@
     color: var(--primary);
 }
 
-.points-used {
-    background: #ffe5e5;
-    color: #d32f2f;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-weight: 700;
-    white-space: nowrap;
+.view-receipt-btn {
+    width: 100%;
+    padding: 10px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .empty-state {
@@ -431,26 +493,9 @@
     background: var(--primary-hover);
 }
 
-/* Responsive Styles */
 @media (max-width: 768px) {
-    .redemption-card {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .reward-icon-box {
-        width: 100px !important;
-        height: 100px !important;
-        font-size: 40px;
-        margin: 0 auto;
-    }
-
-    .redemption-meta {
-        justify-content: center;
-    }
-
-    .view-receipt-btn {
-        width: 100%;
+    .redemption-card-header {
+        height: 120px;
     }
 }
 
@@ -460,74 +505,12 @@
     }
 
     .redemption-card {
-        padding: 15px;
-        gap: 12px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     }
 
     .receipt-modal {
         width: 95%;
         max-width: 100%;
         margin: 10px;
-    }
-
-    .receipt-header {
-        padding: 20px 15px;
-    }
-
-    .receipt-body {
-        padding: 15px;
-    }
-
-    .info-row {
-        flex-direction: row;
-        gap: 10px;
-    }
-
-    .receipt-number-value {
-        font-size: 1rem;
-        word-break: break-all;
-    }
-
-    .pagination .page-btn {
-        padding: 6px 10px;
-        font-size: 0.85rem;
-    }
-}
-
-@media (max-width: 360px) {
-    .history-title {
-        font-size: 1rem;
-    }
-
-    .redemption-card {
-        padding: 12px;
-        gap: 10px;
-    }
-
-    .reward-name-hist {
-        font-size: 1.05rem;
-    }
-
-    .meta-item {
-        font-size: 0.85rem;
-    }
-
-    .points-used {
-        padding: 6px 12px;
-        font-size: 0.9rem;
-    }
-
-    .view-receipt-btn {
-        padding: 6px 12px;
-        font-size: 0.85rem;
-    }
-
-    .receipt-number-value {
-        font-size: 0.85rem;
-    }
-
-    .pagination .page-btn {
-        padding: 5px 8px;
-        font-size: 0.8rem;
     }
 }

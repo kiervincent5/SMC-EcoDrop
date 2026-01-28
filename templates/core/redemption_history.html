@@ -1,12 +1,38 @@
+{% extends 'core/base_dashboard.html' %}
 {% load static %}
+
 {% block title %}Redemption History - EcoDrop{% endblock %}
 
 {% block sidebar %}
-    {% include 'core/includes/user_sidebar.html' %}
+<div class="nav-section">
+    <div class="nav-label">Navigation</div>
+    <ul class="nav-list">
+        <li class="nav-item">
+            <a href="{% if user.is_staff %}{% url 'teacher_dashboard' %}{% else %}{% url 'dashboard' %}{% endif %}">
+                <i class="fas fa-th-large"></i> Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% if user.is_staff %}{% url 'teacher_profile' %}{% else %}{% url 'student_profile' %}{% endif %}">
+                <i class="fas fa-id-card"></i> Profile
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'rewards' %}">
+                <i class="fas fa-gift"></i> Rewards Center
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{% url 'redemption_history' %}" class="active">
+                <i class="fas fa-history"></i> Claims History
+            </a>
+        </li>
+    </ul>
+</div>
 {% endblock %}
 
 {% block extra_styles %}
-<link rel="stylesheet" href="{% static 'core/css/redemption_history.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/redemption_history.css' %}?v={% now 'U' %}">
 {% endblock %}
 
 {% block content %}
@@ -18,46 +44,44 @@
     </div>
 
     {% if redemptions %}
-    <div class="redemptions-list">
+    <div class="redemptions-grid">
         {% for redemption in redemptions %}
         <div class="redemption-card">
-            {% if redemption.reward_item.image %}
-            <div class="reward-icon-box" style="background: white; padding: 8px; width: 120px; height: 120px;">
-                <img src="{{ redemption.reward_item.image.url }}" alt="{{ redemption.reward_item.reward_name }}"
-                    style="width: 100%; height: 100%; object-fit: contain;">
+            <div class="redemption-card-header {% cycle 'beige' 'green' 'blue' 'purple' %}">
+                {% if redemption.reward_item.image %}
+                <img src="{{ redemption.reward_item.image.url }}" alt="{{ redemption.reward_item.reward_name }}">
+                {% else %}
+                <div class="reward-icon"><i class="fas fa-recycle"></i></div>
+                {% endif %}
+                <div class="points-used">-{{ redemption.redeemed_points }} pts</div>
             </div>
-            {% else %}
-            <div class="reward-icon-box {% cycle 'beige' 'green' 'blue' 'purple' %}">
-                <i class="fas fa-recycle"></i>
-            </div>
-            {% endif %}
-            <div class="redemption-details">
+            
+            <div class="redemption-card-body">
                 <div class="reward-name-hist">
                     {{ redemption.reward_item.reward_name }}
                     {% if redemption.quantity and redemption.quantity > 1 %}
-                    <span class="badge" style="background: var(--primary); color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; margin-left: 8px;">x{{ redemption.quantity }}</span>
+                    <span class="qty-badge">x{{ redemption.quantity }}</span>
                     {% endif %}
                 </div>
+                
                 <div class="redemption-meta">
                     <div class="meta-item">
                         <i class="fas fa-calendar"></i>
-                        {{ redemption.created_at|date:"M d, Y" }}
-                    </div>
-                    <div class="meta-item">
-                        <i class="fas fa-clock"></i>
-                        {{ redemption.created_at|date:"h:i A" }}
+                        Redeemed: {{ redemption.created_at|date:"M d, Y" }}
                     </div>
                 </div>
+
+                <button class="view-receipt-btn" 
+                    data-reward-name="{{ redemption.reward_item.reward_name }}"
+                    data-reward-image="{% if redemption.reward_item.image %}{{ redemption.reward_item.image.url }}{% endif %}"
+                    data-receipt-number="{{ redemption.receipt_number }}"
+                    data-redemption-date="{{ redemption.created_at|date:'F d, Y' }}"
+                    data-valid-until="{{ redemption.valid_until|date:'F d, Y' }}"
+                    data-points="{{ redemption.redeemed_points }}" 
+                    data-quantity="{{ redemption.quantity }}">
+                    <i class="fas fa-receipt"></i> View Receipt
+                </button>
             </div>
-            <div class="points-used">-{{ redemption.redeemed_points }} pts</div>
-            <button class="view-receipt-btn" data-reward-name="{{ redemption.reward_item.reward_name }}"
-                data-reward-image="{% if redemption.reward_item.image %}{{ redemption.reward_item.image.url }}{% endif %}"
-                data-receipt-number="{{ redemption.receipt_number }}"
-                data-redemption-date="{{ redemption.created_at|date:'F d, Y' }}"
-                data-valid-until="{{ redemption.valid_until|date:'F d, Y' }}"
-                data-points="{{ redemption.redeemed_points }}" data-quantity="{{ redemption.quantity }}">
-                <i class="fas fa-receipt"></i> View Receipt
-            </button>
         </div>
         {% endfor %}
     </div>
