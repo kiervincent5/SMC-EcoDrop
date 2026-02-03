@@ -61,8 +61,8 @@ const float DETECTION_DISTANCE_CM = 6.0;  // Increased range: detects objects up
 const unsigned long ULTRASONIC_TIMEOUT = 10000;  // 30ms timeout for ultrasonic reading
 
 // Simplified detection timing
-const unsigned long DETECTION_DELAY_MS = 1500;  // Wait 1.5s for sensors to stabilize before verifying
-const unsigned long COOLDOWN_AFTER_PROCESS_MS = 1000;  // 2s cooldown after processing to prevent re-detection
+const unsigned long DETECTION_DELAY_MS = 500;  // Reduced from 1500ms for faster response
+const unsigned long COOLDOWN_AFTER_PROCESS_MS = 1000;
 
 // Bottle session timeout after verify
 const unsigned long VERIFIED_IDLE_TIMEOUT_MS = 40000; // 40 seconds
@@ -115,8 +115,8 @@ void triggerScanner() {
   if (!scannerTriggerActive) {
     digitalWrite(SCANNER_TRIGGER_PIN, LOW);   // Press button (connect to GND)
     scannerTriggerActive = true;
-    scannerTriggerEnd = millis() + 5000;      // Hold for 5 seconds
-    Serial.println("SCANNER: Trigger pulse started (5s)");
+    scannerTriggerEnd = millis() + 300;       // Reduced from 5s to 300ms (standard pulse)
+    Serial.println("SCANNER: Trigger pulse started");
   }
 }
 
@@ -266,31 +266,22 @@ bool apiVerifyUser(const String& code) {
   
   // Clean the code - handle student ID format like "C22-0369"
   String cleanCode = "";
-  Serial.print("DEBUG: Processing characters: ");
   for (int i = 0; i < code.length(); i++) {
     char c = code.charAt(i);
-    Serial.print("'"); Serial.print(c); Serial.print("'("); Serial.print((int)c); Serial.print(") ");
+    // Keep alphanumeric and dashes, and force to UPPERCASE (makes it non-case-sensitive)
     if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '-') {
-      char upperC = (c >= 'a' && c <= 'z') ? (c - 'a' + 'A') : c;  // Manual uppercase conversion
+      char upperC = (c >= 'a' && c <= 'z') ? (c - 'a' + 'A') : c;
       cleanCode += upperC;
     }
   }
-  Serial.println();
   
-  Serial.print("VERIFY: Cleaned student ID: '"); Serial.print(cleanCode); Serial.println("'");
+  Serial.print("VERIFY: Scanned ID: '"); Serial.print(code); 
+  Serial.print("' -> Cleaned: '"); Serial.print(cleanCode); Serial.println("'");
   
   String url = String("http://") + API_HOST + ":" + String(API_PORT) + API_USER_VERIFY_PATH + "?code=" + cleanCode;
   Serial.print("VERIFY: URL: "); Serial.println(url);
   
-  // Test basic connectivity
-  WiFiClient testClient;
-  Serial.print("NETWORK: Testing connection to "); Serial.print(API_HOST); Serial.print(":"); Serial.println(API_PORT);
-  if (testClient.connect(API_HOST, API_PORT)) {
-    Serial.println("NETWORK: Basic TCP connection successful");
-    testClient.stop();
-  } else {
-    Serial.println("NETWORK: Basic TCP connection failed - server unreachable");
-  }
+  // Removed redundant TCP connection check to save time
   
   String resp;
   int httpCode = httpGET(url, API_KEY, resp);
@@ -487,7 +478,7 @@ void debounceInputs(){
 
   // CAP
   int capRead = digitalRead(CAP_PIN);
-  if (capRead != capLast){ capLast = capLast; capChangedAt = now; }
+  if (capRead != capLast){ capLast = capRead; capChangedAt = now; } // Fixed: capLast was capLast
   if (capRead != capStable && (now - capChangedAt) >= CAP_CONFIRM_MS){
     capStable = capRead;
   }

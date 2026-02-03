@@ -18,7 +18,7 @@ const char* WIFI_PASS = "vinceba1";
 //const bool USE_HTTPS = true;                          // Use HTTPS for production
 
 // LOCAL TESTING: Uncomment these 3 lines and comment out production above when testing locally
- const char* API_HOST  = "172.22.14.225";   // Your PC LAN IP
+ const char* API_HOST  = "10.248.177.225";   // Your PC LAN IP
  const uint16_t API_PORT = 8000;            // Local Django dev server port
  const bool USE_HTTPS = false;              // Use HTTP for local testing
 
@@ -421,12 +421,30 @@ void processBottleDetection(){
     lcdBottom("to " + currentUserName.substring(0,12));
     delay(2500);
   }
-  // UNKNOWN OBJECT: Object present but no clear sensor signal
+  // ULTRASONIC ONLY: Object present but no plastic/metal signal
   else if (ultrasonicDetected && !inductiveActive && !capacitiveActive) {
     sortResult = "invalid";
     isAccepted = false;
-    lcdTop("Unknown object!");
-    lcdBottom("Cannot verify");
+    lcdTop("Not plastic!");
+    lcdBottom("pls try again");
+    delay(2000);
+    buzzReject();
+  }
+  // INDUCTIVE ONLY (no ultrasonic) - likely false positive
+  else if (inductiveActive && !ultrasonicDetected) {
+    sortResult = "invalid";
+    isAccepted = false;
+    lcdTop("Sensor error!");
+    lcdBottom("No object found");
+    delay(2000);
+    buzzReject();
+  }
+  // CAPACITIVE ONLY (no ultrasonic) - likely false positive
+  else if (capacitiveActive && !ultrasonicDetected) {
+    sortResult = "invalid";
+    isAccepted = false;
+    lcdTop("Not plastic!");
+    lcdBottom("pls try again");
     delay(2000);
     buzzReject();
   }
